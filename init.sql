@@ -10,6 +10,12 @@ CREATE TABLE IF NOT EXISTS us_states (
     state_name VARCHAR(14) NOT NULL
 );
 
+-- Create table for tracking visited states
+CREATE TABLE IF NOT EXISTS states_visited (
+    state_id VARCHAR(2) PRIMARY KEY REFERENCES us_states(state_id),
+    visited BOOLEAN NOT NULL DEFAULT FALSE
+);
+
 -- Insert US states data
 INSERT INTO us_states (state_id, state_name) VALUES 
     ('AL', 'Alabama'),

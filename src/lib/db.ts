@@ -41,9 +41,43 @@ export interface USState {
   state_name: string;
 }
 
+export interface StateWithVisitStatus {
+  state_id: string;
+  state_name: string;
+  visited: boolean;
+}
+
 // Database operations
 export const db = {
-  // Get all US states
+  // Get all US states with visit status
+  async getAllStatesWithVisitStatus(): Promise<StateWithVisitStatus[]> {
+    const result = await query(`
+      SELECT 
+        states.state_id, 
+        states.state_name, 
+        COALESCE(visited.visited, FALSE) as visited
+      FROM us_states states 
+      LEFT JOIN states_visited visited ON states.state_id = visited.state_id 
+      ORDER BY states.state_name
+    `);
+    return result.rows.map((row: any) => ({
+      ...row,
+      visited: Boolean(row.visited)
+    }));
+  },
+
+  // Toggle visit status for a state
+  async toggleStateVisitStatus(stateId: string, visited: boolean): Promise<void> {
+    // Use UPSERT (INSERT ... ON CONFLICT) to handle both insert and update
+    await query(`
+      INSERT INTO states_visited (state_id, visited) 
+      VALUES ($1, $2) 
+      ON CONFLICT (state_id) 
+      DO UPDATE SET visited = $2
+    `, [stateId, visited ? 1 : 0]);
+  },
+
+  // Get all US states (legacy method)
   async getAllStates(): Promise<USState[]> {
     const result = await query('SELECT * FROM us_states ORDER BY state_name');
     return result.rows;

@@ -4,7 +4,7 @@ import { db } from '@/lib/db';
 // GET /api/get_states - Get all US states
 export async function GET(request: NextRequest) {
   try {    
-    const states = await db.getAllStates();
+    const states = await db.getAllStatesWithVisitStatus();
     
     return NextResponse.json(states);
   } catch (error) {

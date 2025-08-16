@@ -5,12 +5,41 @@ import { useEffect, useState } from 'react';
 interface USState {
   state_id: string;
   state_name: string;
+  visited: boolean;
 }
 
 export default function StatesTable() {
   const [states, setStates] = useState<USState[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const handleCheckboxChange = async (stateId: string, checked: boolean) => {
+    try {
+      const response = await fetch('/api/toggle-state-visit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ stateId, visited: checked }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update visit status');
+      }
+
+      // Update local state
+      setStates(prevStates =>
+        prevStates.map(state =>
+          state.state_id === stateId
+            ? { ...state, visited: checked }
+            : state
+        )
+      );
+    } catch (err) {
+      console.error('Error updating visit status:', err);
+      // You could add a toast notification here
+    }
+  };
 
   useEffect(() => {
     const fetchStates = async () => {
@@ -66,6 +95,8 @@ export default function StatesTable() {
                     <td className="px-4 py-2 text-sm text-gray-900 w-1/5 text-center">
                       <input
                         type="checkbox"
+                        checked={state.visited}
+                        onChange={(e) => handleCheckboxChange(state.state_id, e.target.checked)}
                         className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
                       />
                     </td>
