@@ -2,11 +2,14 @@ FROM node:18-alpine
 
 WORKDIR /app
 
+# Install pnpm
+RUN npm install -g pnpm
+
 # Copy package files
-COPY package.json package-lock.json ./
+COPY package.json pnpm-lock.yaml ./
 
 # Install dependencies
-RUN npm ci
+RUN pnpm install
 
 # Copy source code
 COPY . .
@@ -14,5 +17,5 @@ COPY . .
 # Expose port
 EXPOSE 3000
 
-# Start development server
-CMD ["npm", "run", "dev"]
+# Start development server with polling for file changes
+CMD ["pnpm", "run", "dev"]

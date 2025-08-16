@@ -20,12 +20,34 @@ services:
       timeout: 5s
       retries: 5
 
-  # Next.js Application
+  # Development version (default)
   app:
     build:
       context: .
+      dockerfile: Dockerfile.dev
+    container_name: travel-tracker-app-dev
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://myuser:mypassword@postgres:5432/personal_database
+      - NODE_ENV=development
+      - WATCHPACK_POLLING=true
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - travel-tracker-network
+
+  # Production version (optional)
+  app-prod:
+    build:
+      context: .
       dockerfile: Dockerfile
-    container_name: travel-tracker-app
+    container_name: travel-tracker-app-prod
     ports:
       - "3000:3000"
     environment:
@@ -36,29 +58,8 @@ services:
         condition: service_healthy
     networks:
       - travel-tracker-network
-    restart: unless-stopped
-
-  # Development version (optional)
-  app-dev:
-    build:
-      context: .
-      dockerfile: Dockerfile.dev
-    container_name: travel-tracker-app-dev
-    ports:
-      - "3001:3000"
-    environment:
-      - DATABASE_URL=postgresql://myuser:mypassword@postgres:5432/personal_database
-      - NODE_ENV=development
-    volumes:
-      - .:/app
-      - /app/node_modules
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - travel-tracker-network
     profiles:
-      - dev
+      - prod
 
 volumes:
   postgres_data:

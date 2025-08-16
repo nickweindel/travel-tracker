@@ -1,10 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: 'standalone',
-  experimental: {
-    serverComponentsExternalPackages: ['pg']
-  },
+  ...(process.env.NODE_ENV === 'production' && { output: 'standalone' }),
+  serverExternalPackages: ['pg'],
   eslint: {
     ignoreDuringBuilds: true,
   },
