@@ -56,17 +56,23 @@ export default function StatesTable() {
       return (
       <div className="h-full">
         <div className="h-full overflow-y-auto pr-2">
-          <table className="min-w-full bg-white border border-gray-200 rounded-lg">
-            <tbody className="divide-y divide-gray-200">
-              {states.map((state) => (
-                <tr key={state.state_id} className="hover:bg-gray-50">
-                  <td className="px-4 py-2 text-sm text-gray-900">
-                    {state.state_name}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                      <table className="min-w-full bg-white border border-gray-200 rounded-lg">
+              <tbody className="divide-y divide-gray-200">
+                {states.map((state) => (
+                  <tr key={state.state_id} className="hover:bg-gray-50">
+                    <td className="px-4 py-2 text-sm text-gray-900 w-4/5">
+                      {state.state_name}
+                    </td>
+                    <td className="px-4 py-2 text-sm text-gray-900 w-1/5 text-center">
+                      <input
+                        type="checkbox"
+                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
         </div>
       </div>
   );
