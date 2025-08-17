@@ -10,7 +10,7 @@ interface VisitKPIsProps {
 }
 
 export default function VisitKPIs({ placeType, visited, notVisited, total }: VisitKPIsProps) {
-  const percentageVisited = numeral(visited / total).format("0%");
+  const percentageVisited = visited / total;
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
