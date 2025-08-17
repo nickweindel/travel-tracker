@@ -1,14 +1,16 @@
 # Travel Tracker
 
-A Next.js application for tracking travel experiences with PostgreSQL backend.
+A Next.js application for tracking travel experiences with PostgreSQL backend. Currently focused on tracking US states visited.
 
 ## Features
 
 - PostgreSQL database for data persistence
 - Docker containerization for easy deployment
-- RESTful API endpoints for managing trips and locations
+- RESTful API endpoints for managing state visits
 - TypeScript support
 - Modern UI with Tailwind CSS
+- Real-time KPI tracking with visit statistics
+- Responsive design with scrollable state lists
 
 ## Prerequisites
 
@@ -25,56 +27,66 @@ A Next.js application for tracking travel experiences with PostgreSQL backend.
 
 2. **Start the application with Docker Compose**
    ```bash
-   # Start production version
+   # Start development version (default)
    docker-compose up -d
    
-   # Or start development version with hot reload
-   docker-compose --profile dev up -d
+   # Or start production version
+   docker-compose --profile prod up -d
    ```
 
 3. **Access the application**
-   - Frontend: http://localhost:3000 (production) or http://localhost:3001 (development)
+   - Frontend: http://localhost:3000
    - Database: localhost:5432
-   - Health check: http://localhost:3000/api/health
+   - Database credentials: myuser/mypassword
+   - Database name: personal_database
 
 ## Environment Variables
 
-Create a `.env.local` file in the root directory:
+The application uses the following environment variables (configured in docker-compose.yml):
 
 ```env
 # Database Configuration
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/travel_tracker
+DATABASE_URL=postgresql://myuser:mypassword@postgres:5432/personal_database
 
 # Next.js Configuration
 NODE_ENV=development
+WATCHPACK_POLLING=true  # For development hot reload
 ```
 
 ## Database Schema
 
 The application includes the following tables:
 
-- **users**: User accounts
-- **trips**: Travel trips
-- **locations**: Places visited during trips
+### us_states
+- `state_id` (VARCHAR(2), PRIMARY KEY) - Two-letter state code (e.g., 'CA', 'NY')
+- `state_name` (VARCHAR(14), NOT NULL) - Full state name (e.g., 'California', 'New York')
+
+### states_visited
+- `state_id` (VARCHAR(2), PRIMARY KEY, FOREIGN KEY) - References us_states.state_id
+- `visited` (BOOLEAN, NOT NULL, DEFAULT FALSE) - Whether the state has been visited
+
+The database is pre-populated with all 50 US states.
 
 ## API Endpoints
 
-### Health Check
-- `GET /api/health` - Check application and database health
+### States Management
+- `GET /api/get-states` - Get all US states with visit status
+  - Returns: Array of states with `state_id`, `state_name`, and `visited` boolean
+  - Example response:
+    ```json
+    [
+      {
+        "state_id": "CA",
+        "state_name": "California",
+        "visited": true
+      }
+    ]
+    ```
 
-### Trips
-- `GET /api/trips?userId=<id>` - Get all trips for a user
-- `POST /api/trips` - Create a new trip
-- `GET /api/trips/[id]` - Get a specific trip
-- `PUT /api/trips/[id]` - Update a trip
-- `DELETE /api/trips/[id]` - Delete a trip
-
-### Locations
-- `GET /api/locations?tripId=<id>` - Get all locations for a trip
-- `POST /api/locations` - Create a new location
-- `GET /api/locations/[id]` - Get a specific location
-- `PUT /api/locations/[id]` - Update a location
-- `DELETE /api/locations/[id]` - Delete a location
+### Visit Status Management
+- `POST /api/toggle-state-visit` - Toggle visit status for a state
+  - Body: `{ "stateId": "CA", "visited": true }`
+  - Returns: `{ "success": true }`
 
 ## Development
 
@@ -82,7 +94,7 @@ The application includes the following tables:
 
 1. **Install dependencies**
    ```bash
-   npm install
+   pnpm install
    ```
 
 2. **Set up environment variables**
@@ -93,22 +105,24 @@ The application includes the following tables:
 
 3. **Start the development server**
    ```bash
-   npm run dev
+   pnpm dev
    ```
 
 ### Database Management
 
 The PostgreSQL database is automatically initialized with:
-- Sample user data
-- Database schema
-- Indexes for performance
-- Triggers for automatic timestamp updates
+- All 50 US states
+- Database schema with foreign key constraints
+- Automatic visit status tracking
 
 ### Docker Commands
 
 ```bash
-# Start all services
+# Start all services (development)
 docker-compose up -d
+
+# Start production version
+docker-compose --profile prod up -d
 
 # View logs
 docker-compose logs -f
@@ -130,6 +144,12 @@ travel-tracker/
 ├── src/
 │   ├── app/                 # Next.js app directory
 │   │   ├── api/            # API routes
+│   │   │   ├── get-states/ # States API endpoint
+│   │   │   └── toggle-state-visit/ # Visit status API endpoint
+│   │   └── ...
+│   ├── components/         # React components
+│   │   ├── states-table.tsx # States list with checkboxes
+│   │   ├── visit-kpis.tsx  # KPI display component
 │   │   └── ...
 │   ├── lib/
 │   │   └── db.ts          # Database utilities
@@ -140,6 +160,14 @@ travel-tracker/
 ├── init.sql              # Database initialization script
 └── ...
 ```
+
+## Current Features
+
+- **State Tracking**: Check/uncheck states to mark them as visited
+- **Real-time KPIs**: View visited count, not visited count, and percentage
+- **Persistent Storage**: Visit status persists across sessions
+- **Responsive Design**: Works on desktop and mobile devices
+- **Database Integration**: PostgreSQL backend with proper foreign key relationships
 
 ## Troubleshooting
 
@@ -157,12 +185,25 @@ travel-tracker/
 
 3. Test database connection:
    ```bash
-   curl http://localhost:3000/api/health
+   curl http://localhost:3000/api/get-states
    ```
 
 ### Port Conflicts
 
-If ports 3000, 3001, or 5432 are already in use, you can modify the `docker-compose.yml` file to use different ports.
+The application uses:
+- Port 3000: Next.js application (both dev and prod)
+- Port 5432: PostgreSQL database
+
+If these ports are already in use, you can modify the `docker-compose.yml` file to use different ports.
+
+### Container Name Conflicts
+
+If you get container name conflicts, remove existing containers:
+```bash
+docker-compose down
+docker rm -f travel-tracker-app-dev travel-tracker-postgres
+docker-compose up -d
+```
 
 ## Contributing
 
