@@ -18,8 +18,10 @@
     "next": "15.4.6",
     "numeral": "^2.0.6",
     "pg": "^8.11.3",
+    "prop-types": "^15.8.1",
     "react": "19.1.0",
     "react-dom": "19.1.0",
+    "react-usa-map": "^1.5.0",
     "tailwind": "^4.0.0",
     "tailwind-merge": "^3.3.1"
   },

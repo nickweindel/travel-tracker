@@ -9,7 +9,11 @@ interface USState {
   visited: boolean;
 }
 
-export default function StatesTable() {
+interface StatesTableProps {
+  onStatesChange?: (states: USState[]) => void;
+}
+
+export default function StatesTable({ onStatesChange }: StatesTableProps) {
   const [states, setStates] = useState<USState[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -29,13 +33,13 @@ export default function StatesTable() {
       }
 
       // Update local state
-      setStates(prevStates =>
-        prevStates.map(state =>
-          state.state_id === stateId
-            ? { ...state, visited: checked }
-            : state
-        )
+      const updatedStates = states.map(state =>
+        state.state_id === stateId
+          ? { ...state, visited: checked }
+          : state
       );
+      setStates(updatedStates);
+      onStatesChange?.(updatedStates);
     } catch (err) {
       console.error('Error updating visit status:', err);
       // You could add a toast notification here
@@ -51,6 +55,7 @@ export default function StatesTable() {
         }
         const data = await response.json();
         setStates(data);
+        onStatesChange?.(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
       } finally {
