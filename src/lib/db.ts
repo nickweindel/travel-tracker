@@ -47,6 +47,13 @@ export interface StateWithVisitStatus {
   visited: boolean;
 }
 
+export interface Country {
+  country_id: string;
+  country_name: string;
+  continent: string;
+  visited: boolean;
+}
+
 // Database operations
 export const db = {
   // Get all US states with visit status
