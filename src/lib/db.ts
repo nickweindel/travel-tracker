@@ -51,13 +51,36 @@ export interface Country {
   country_id: string;
   country_name: string;
   continent: string;
-  visited: boolean;
+}
+
+export interface CountryWithVisitStatus {
+  country_id: string;
+  country_name: string;
+  continent: string;
+  visited: boolean; 
 }
 
 // Database operations
 export const db = {
   // Get all US states with visit status
   async getAllStatesWithVisitStatus(): Promise<StateWithVisitStatus[]> {
+    const result = await query(`
+      SELECT 
+        states.state_id, 
+        states.state_name, 
+        COALESCE(visited.visited, FALSE) as visited
+      FROM us_states states 
+      LEFT JOIN states_visited visited ON states.state_id = visited.state_id 
+      ORDER BY states.state_name
+    `);
+    return result.rows.map((row: any) => ({
+      ...row,
+      visited: Boolean(row.visited)
+    }));
+  },
+
+  // Get all countries/continents with visit status
+  async getAllCountriesWithVisitStatus(): Promise<CountryWithVisitStatus[]> {
     const result = await query(`
       SELECT 
         states.state_id, 
@@ -82,6 +105,17 @@ export const db = {
       ON CONFLICT (state_id) 
       DO UPDATE SET visited = $2
     `, [stateId, visited ? 1 : 0]);
+  },
+
+  // Toggle visit status for a country
+  async toggleCountryVisitStatus(countryId: string, visited: boolean): Promise<void> {
+    // Use UPSERT (INSERT ... ON CONFLICT) to handle both insert and update
+    await query(`
+      INSERT INTO countries_visited (country_id, visited) 
+      VALUES ($1, $2) 
+      ON CONFLICT (country_id) 
+      DO UPDATE SET visited = $2
+    `, [countryId, visited ? 1 : 0]);
   },
 
   // Get all US states (legacy method)
