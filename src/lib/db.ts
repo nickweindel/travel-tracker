@@ -83,12 +83,13 @@ export const db = {
   async getAllCountriesWithVisitStatus(): Promise<CountryWithVisitStatus[]> {
     const result = await query(`
       SELECT 
-        states.state_id, 
-        states.state_name, 
+        countries.country_id, 
+        countries.country_name,
+        countries.continent, 
         COALESCE(visited.visited, FALSE) as visited
-      FROM us_states states 
-      LEFT JOIN states_visited visited ON states.state_id = visited.state_id 
-      ORDER BY states.state_name
+      FROM countries countries 
+      LEFT JOIN countries_visited visited ON countries.country_id = visited.country_id 
+      ORDER BY countries.country_name
     `);
     return result.rows.map((row: any) => ({
       ...row,

@@ -1,31 +1,31 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import VisitKPIs from './visit-kpis';
 
-interface USState {
-  state_id: string;
-  state_name: string;
+interface Country {
+  country_id: string;
+  country_name: string;
+  continent: string;
   visited: boolean;
 }
 
-interface StatesTableProps {
-  onStatesChange?: (states: USState[]) => void;
+interface CountriesTableProps {
+  onCountriesChange?: (countries: Country[]) => void;
 }
 
-export default function StatesTable({ onStatesChange }: StatesTableProps) {
-  const [states, setStates] = useState<USState[]>([]);
+export default function CountriesTable({ onCountriesChange }: CountriesTableProps) {
+  const [countries, setCountries] = useState<Country[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const handleCheckboxChange = async (stateId: string, checked: boolean) => {
+  const handleCheckboxChange = async (countryId: string, checked: boolean) => {
     try {
-      const response = await fetch('/api/toggle-state-visit', {
+      const response = await fetch('/api/toggle-country-visit', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ stateId, visited: checked }),
+        body: JSON.stringify({ countryId, visited: checked }),
       });
 
       if (!response.ok) {
@@ -33,28 +33,29 @@ export default function StatesTable({ onStatesChange }: StatesTableProps) {
       }
 
       // Update local state
-      const updatedStates = states.map(state =>
-        state.state_id === stateId
-          ? { ...state, visited: checked }
-          : state
+      const updatedCountries = countries.map(country =>
+        country.country_id === countryId
+          ? { ...country, visited: checked }
+          : country
       );
-      setStates(updatedStates);
-      onStatesChange?.(updatedStates);
+      setCountries(updatedCountries);
+      onCountriesChange?.(updatedCountries);
     } catch (err) {
       console.error('Error updating visit status:', err);
     }
   };
 
   useEffect(() => {
-    const fetchStates = async () => {
+    const fetchCountries = async () => {
       try {
-        const response = await fetch('/api/get-states');
+        const response = await fetch('/api/get-countries');
+        console.log(response);
         if (!response.ok) {
-          throw new Error('Failed to fetch states');
+          throw new Error('Failed to fetch countries');
         }
         const data = await response.json();
-        setStates(data);
-        onStatesChange?.(data);
+        setCountries(data);
+        onCountriesChange?.(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
       } finally {
@@ -62,7 +63,7 @@ export default function StatesTable({ onStatesChange }: StatesTableProps) {
       }
     };
 
-    fetchStates();
+    fetchCountries();
   }, []);
 
   if (loading) {
@@ -87,37 +88,23 @@ export default function StatesTable({ onStatesChange }: StatesTableProps) {
     );
   }
 
-  const visitedCount = states.filter(state => state.visited).length;
-  const notVisitedCount = states.filter(state => !state.visited).length;
-  const totalCount = states.length;
-
   return (
     <div className="h-full flex flex-col">
-      {/* KPIs Section */}
-      <div className="mb-4">
-        <VisitKPIs
-          placeType="States"
-          visited={visitedCount}
-          notVisited={notVisitedCount}
-          total={totalCount}
-        />
-      </div>
-
       {/* Table Section */}
       <div className="flex-1 overflow-hidden">
         <div className="h-full overflow-y-auto">
           <table className="min-w-full bg-white border border-gray-200 rounded-lg">
             <tbody className="divide-y divide-gray-200">
-              {states.map((state) => (
-                <tr key={state.state_id} className="hover:bg-gray-50">
+              {countries.map((country) => (
+                <tr key={country.country_id} className="hover:bg-gray-50">
                   <td className="px-4 py-2 text-sm text-gray-900 w-4/5">
-                    {state.state_name}
+                    {country.country_name}
                   </td>
                   <td className="px-4 py-2 text-sm text-gray-900 w-1/5 text-center">
                     <input
                       type="checkbox"
-                      checked={state.visited}
-                      onChange={(e) => handleCheckboxChange(state.state_id, e.target.checked)}
+                      checked={country.visited}
+                      onChange={(e) => handleCheckboxChange(country.country_id, e.target.checked)}
                       className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
                     />
                   </td>

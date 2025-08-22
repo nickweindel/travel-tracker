@@ -2,8 +2,13 @@
 
 import { useState } from "react";
 import { SiteHeader } from "@/components/site-header";
+
+// Domestic travel components.
 import StatesTable from "@/components/domestic-travel/states-table";
 import UsaMap from "@/components/domestic-travel/usa-map";
+
+// International travel components.
+import CountriesTable from "@/components/international-travel/countries-table";
 
 interface USState {
   state_id: string;
@@ -11,9 +16,17 @@ interface USState {
   visited: boolean;
 }
 
+interface Country {
+  country_id: string;
+  country_name: string;
+  continent: string;
+  visited: boolean;
+}
+
 export default function Home() {
-  const [states, setStates] = useState<USState[]>([]);
   const [travelType, setTravelType] = useState<"Domestic" | "International">("Domestic");
+  const [states, setStates] = useState<USState[]>([]);
+  const [countries, setCountries] = useState<Country[]>([]);
 
   return (
     <div className="flex flex-col h-screen overflow-hidden">
@@ -25,9 +38,7 @@ export default function Home() {
           {travelType === "Domestic" ? (
             <StatesTable onStatesChange={setStates} />
           ) : (
-            <div>
-              Under construction
-            </div>
+            <CountriesTable onCountriesChange={setCountries} />
           )}
         </div>
         <div className="w-2/3 p-4 flex flex-col">

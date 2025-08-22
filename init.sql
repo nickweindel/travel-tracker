@@ -16,6 +16,19 @@ CREATE TABLE IF NOT EXISTS states_visited (
     visited BOOLEAN NOT NULL DEFAULT FALSE
 );
 
+-- Create table for countries
+CREATE TABLE IF NOT EXISTS countries (
+    country_id VARCHAR(2) PRIMARY KEY,
+    country_name VARCHAR(100) NOT NULL,
+    continent VARCHAR(13) NOT NULL
+);
+
+-- Create table for tracking visited countries/continents
+CREATE TABLE IF NOT EXISTS countries (
+    country_id VARCHAR(2) PRIMARY KEY REFERENCES countries(country_id),
+    visited BOOLEAN NOT NULL default FALSE
+);
+
 -- Insert US states data
 INSERT INTO us_states (state_id, state_name) VALUES 
     ('AL', 'Alabama'),
@@ -69,16 +82,3 @@ INSERT INTO us_states (state_id, state_name) VALUES
     ('WI', 'Wisconsin'),
     ('WY', 'Wyoming')
 ON CONFLICT (state_id) DO NOTHING;
-
--- Create table for countries
-CREATE TABLE IF NOT EXISTS countries (
-    country_id VARCHAR(2) PRIMARY KEY,
-    country_name VARCHAR(100) NOT NULL,
-    continent VARCHAR(13) NOT NULL
-)
-
--- Create table for tracking visited countries/continents
-CREATE TABLE IF NOT EXISTS countries (
-    country_id VARCHAR(2) PRIMARY KEY REFERENCES countries(country_id),
-    visited BOOLEAN NOT NULL default FALSE
-)
