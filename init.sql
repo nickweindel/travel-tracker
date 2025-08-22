@@ -4,7 +4,7 @@
 -- Create extensions if needed
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- Create tables for travel tracking
+-- Create table for states
 CREATE TABLE IF NOT EXISTS us_states (
     state_id VARCHAR(2) PRIMARY KEY,
     state_name VARCHAR(14) NOT NULL
@@ -70,9 +70,15 @@ INSERT INTO us_states (state_id, state_name) VALUES
     ('WY', 'Wyoming')
 ON CONFLICT (state_id) DO NOTHING;
 
--- Create table for tracking visited countries
+-- Create table for countries
 CREATE TABLE IF NOT EXISTS countries (
     country_id VARCHAR(2) PRIMARY KEY,
-    country VARCHAR(100) NOT NULL,
+    country_name VARCHAR(100) NOT NULL,
     continent VARCHAR(13) NOT NULL
+)
+
+-- Create table for tracking visited countries/continents
+CREATE TABLE IF NOT EXISTS countries (
+    country_id VARCHAR(2) PRIMARY KEY REFERENCES countries(country_id),
+    visited BOOLEAN NOT NULL default FALSE
 )

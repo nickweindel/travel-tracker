@@ -123,4 +123,10 @@ export const db = {
     const result = await query('SELECT * FROM us_states ORDER BY state_name');
     return result.rows;
   },
+
+  // Get all countries (legacy method)
+  async getAllCountries(): Promise<Country[]> {
+    const result = await query('SELECT * FROM countries ORDER BY country_name');
+    return result.rows
+  }
 };

@@ -25,10 +25,10 @@ export async function POST() {
 
     if (cca2 && name && continent) {
       await client.query(
-        `INSERT INTO countries (country_id, country, continent)
+        `INSERT INTO countries (country_id, country_name, continent)
          VALUES ($1, $2, $3)
          ON CONFLICT (country_id) DO UPDATE
-         SET country = EXCLUDED.country, continent = EXCLUDED.continent`,
+         SET country_name = EXCLUDED.country, continent = EXCLUDED.continent`,
         [cca2, name, continent]
       );
     }
