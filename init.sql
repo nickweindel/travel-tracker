@@ -71,8 +71,8 @@ INSERT INTO us_states (state_id, state_name) VALUES
 ON CONFLICT (state_id) DO NOTHING;
 
 -- Create table for tracking visited countries
-CREATE TABLE IF NOT EXISTS countries_visited (
+CREATE TABLE IF NOT EXISTS countries (
     country_id VARCHAR(2) PRIMARY KEY,
     country VARCHAR(100) NOT NULL,
-    continent VARCHAR(13) NOT NULL,
+    continent VARCHAR(13) NOT NULL
 )
