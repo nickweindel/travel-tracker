@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS countries (
 );
 
 -- Create table for tracking visited countries/continents
-CREATE TABLE IF NOT EXISTS countries (
+CREATE TABLE IF NOT EXISTS countries_visited (
     country_id VARCHAR(2) PRIMARY KEY REFERENCES countries(country_id),
     visited BOOLEAN NOT NULL default FALSE
 );
