@@ -13,11 +13,12 @@ interface USState {
 
 export default function Home() {
   const [states, setStates] = useState<USState[]>([]);
+  const [travelType, setTravelType] = useState<"Domestic" | "International">("Domestic");
 
   return (
     <div className="flex flex-col h-screen overflow-hidden">
       <div className="h-[80px] flex-shrink-0">
-        <SiteHeader />
+        <SiteHeader travelType={travelType} setTravelType={setTravelType}/>
       </div>
       <div className="flex flex-1 overflow-hidden">
         <div className="w-1/3 p-4 flex flex-col">

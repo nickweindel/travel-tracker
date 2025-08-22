@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@radix-ui/react-separator": "^1.1.7",
+    "@radix-ui/react-switch": "^1.2.6",
     "@types/numeral": "^2.0.5",
     "@types/pg": "^8.10.9",
     "class-variance-authority": "^0.7.1",
