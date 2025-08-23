@@ -116,7 +116,7 @@ export default function CountriesTable({ onCountriesChange }: CountriesTableProp
       {/* KPIs Section */}
       <div className="mb-4">
         <VisitKPIs
-          placeType="Countries"
+          placeType={countryOrContinent}
           visited={countryOrContinent === "Countries" ? visitedCountryCount : visitedContinentCount}
           notVisited={countryOrContinent === "Countries" ? notVisitedCountryCount : notVisitedContinentCount}
           total={countryOrContinent === "Countries" ? totalCountryCount : totalContinentCount}
