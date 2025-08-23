@@ -10,6 +10,10 @@ const transformContinent = (region: string, subregion: string): string => {
 
 export async function POST() {
   const res = await fetch('https://restcountries.com/v3.1/all?fields=name,region,subregion,cca2');
+  if (!res.ok) {
+    throw new Error(`Failed to fetch countries: ${res.status} ${res.statusText}`);
+  }
+
   const data = await res.json();
 
   const client = new Client({
@@ -28,7 +32,7 @@ export async function POST() {
         `INSERT INTO countries (country_id, country_name, continent)
          VALUES ($1, $2, $3)
          ON CONFLICT (country_id) DO UPDATE
-         SET country_name = EXCLUDED.country, continent = EXCLUDED.continent`,
+         SET country_name = EXCLUDED.country_name, continent = EXCLUDED.continent`,
         [cca2, name, continent]
       );
     }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { SiteHeader } from "@/components/site-header";
+import { SiteHeader, TravelType } from "@/components/site-header";
 
 // Domestic travel components.
 import StatesTable from "@/components/domestic-travel/states-table";
@@ -9,6 +9,7 @@ import UsaMap from "@/components/domestic-travel/usa-map";
 
 // International travel components.
 import CountriesTable from "@/components/international-travel/countries-table";
+import WorldMap from "@/components/international-travel/world-map";
 
 interface USState {
   state_id: string;
@@ -24,7 +25,7 @@ interface Country {
 }
 
 export default function Home() {
-  const [travelType, setTravelType] = useState<"Domestic" | "International">("Domestic");
+  const [travelType, setTravelType] = useState<TravelType>("Domestic");
   const [states, setStates] = useState<USState[]>([]);
   const [countries, setCountries] = useState<Country[]>([]);
 
@@ -46,9 +47,7 @@ export default function Home() {
             {travelType === "Domestic" ? (
               <UsaMap states={states} />
             ) : (
-              <div>
-                Under Construction Too!
-              </div>
+              <WorldMap countries={countries} />
             )}
           </div>
         </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import VisitKPIs from './visit-kpis';
+import VisitKPIs from '../visit-kpis';
 
 interface USState {
   state_id: string;

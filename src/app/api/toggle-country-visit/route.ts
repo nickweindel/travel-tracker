@@ -5,6 +5,9 @@ import { db } from '@/lib/db';
 export async function POST(request: NextRequest) {
   try {
     const { countryId, visited } = await request.json();
+
+    console.log("********")
+    console.log(countryId);
     
     if (!countryId || typeof visited !== 'boolean') {
       return NextResponse.json(
@@ -13,7 +16,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    await db.toggleStateVisitStatus(countryId, visited);
+    await db.toggleCountryVisitStatus(countryId, visited);
     
     return NextResponse.json({ success: true });
   } catch (error) {

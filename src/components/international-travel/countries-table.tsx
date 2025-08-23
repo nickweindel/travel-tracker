@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import VisitKPIs from '../visit-kpis';
 
 interface Country {
   country_id: string;
@@ -15,6 +16,7 @@ interface CountriesTableProps {
 
 export default function CountriesTable({ onCountriesChange }: CountriesTableProps) {
   const [countries, setCountries] = useState<Country[]>([]);
+  const [countryOrContinent, setCountryOrContinent] = useState<"Countries" | "Continents">("Countries")
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -49,7 +51,6 @@ export default function CountriesTable({ onCountriesChange }: CountriesTableProp
     const fetchCountries = async () => {
       try {
         const response = await fetch('/api/get-countries');
-        console.log(response);
         if (!response.ok) {
           throw new Error('Failed to fetch countries');
         }
@@ -88,8 +89,41 @@ export default function CountriesTable({ onCountriesChange }: CountriesTableProp
     );
   }
 
+  // Countriy stats.
+  const visitedCountryCount = countries.filter(country => country.visited).length;
+  const notVisitedCountryCount = countries.filter(country => !country.visited).length;
+  const totalCountryCount = countries.length;
+
+  // Continent stats.
+  const distinctContinents = Array.from(new Set(countries.map(c => c.continent)));
+  const totalContinentCount = distinctContinents.length;
+
+  const visitedContinents = new Set(
+    countries.filter(c => c.visited).map(c => c.continent)
+  );
+  const visitedContinentCount = visitedContinents.size;
+
+  const allContinents = new Set(countries.map(c => c.continent));
+  const notVisitedContinents = new Set(
+    [...allContinents].filter(continent => 
+      !countries.some(c => c.continent === continent && c.visited)
+    )
+  );
+  const notVisitedContinentCount = notVisitedContinents.size;
+
   return (
     <div className="h-full flex flex-col">
+      {/* KPIs Section */}
+      <div className="mb-4">
+        <VisitKPIs
+          placeType="Countries"
+          visited={countryOrContinent === "Countries" ? visitedCountryCount : visitedContinentCount}
+          notVisited={countryOrContinent === "Countries" ? notVisitedCountryCount : notVisitedContinentCount}
+          total={countryOrContinent === "Countries" ? totalCountryCount : totalContinentCount}
+          countryOrContinent={countryOrContinent}
+          setCountryOrContinent={setCountryOrContinent}
+        />
+      </div>
       {/* Table Section */}
       <div className="flex-1 overflow-hidden">
         <div className="h-full overflow-y-auto">
@@ -97,8 +131,11 @@ export default function CountriesTable({ onCountriesChange }: CountriesTableProp
             <tbody className="divide-y divide-gray-200">
               {countries.map((country) => (
                 <tr key={country.country_id} className="hover:bg-gray-50">
-                  <td className="px-4 py-2 text-sm text-gray-900 w-4/5">
+                  <td className="px-4 py-2 text-sm text-gray-900 w-3/5">
                     {country.country_name}
+                  </td>
+                  <td className="px-4 py-2 text-sm text-gray-900 w-1/5">
+                    {country.continent}
                   </td>
                   <td className="px-4 py-2 text-sm text-gray-900 w-1/5 text-center">
                     <input
