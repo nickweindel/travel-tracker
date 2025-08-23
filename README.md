@@ -1,6 +1,6 @@
 # Travel Tracker
 
-A Next.js application for tracking travel experiences with PostgreSQL backend. Currently focused on tracking US states visited.
+A Next.js application for tracking travel experiences with PostgreSQL backend. Currently focused on tracking US states and countries/continents visited.
 
 ## Features
 
