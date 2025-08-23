@@ -6,11 +6,12 @@ A Next.js application for tracking travel experiences with PostgreSQL backend. C
 
 - PostgreSQL database for data persistence
 - Docker containerization for easy deployment
-- RESTful API endpoints for managing state visits
+- RESTful API endpoints for managing state and country visits
 - TypeScript support
 - Modern UI with Tailwind CSS
 - Real-time KPI tracking with visit statistics
 - Responsive design with scrollable state lists
+- Maps to visualize travel
 
 ## Prerequisites
 
