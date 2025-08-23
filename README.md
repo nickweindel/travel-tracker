@@ -1,6 +1,6 @@
 # Travel Tracker
 
-A Next.js application for tracking travel experiences with PostgreSQL backend. Currently focused on tracking US states visited.
+A Next.js application for tracking travel experiences with PostgreSQL backend. Currently focused on tracking US states and countries/continents visited.
 
 ## Features
 
@@ -65,7 +65,18 @@ The application includes the following tables:
 - `state_id` (VARCHAR(2), PRIMARY KEY, FOREIGN KEY) - References us_states.state_id
 - `visited` (BOOLEAN, NOT NULL, DEFAULT FALSE) - Whether the state has been visited
 
-The database is pre-populated with all 50 US states.
+### countries
+- `country_id` (VARCHAR(2), PRIMARY KEY) - Two-letter country code (e.g. "MX", "NZ")
+- `country_name` (VARCHAR(100), NOT NULL) - Full (common) country name (e.g. 'Mexico', 'New Zealand')
+- `continent` (VARCHAR(13), NOT NULL) - Full continent name (this project uses 7 continents)
+
+### countries_visited
+- `country_id` (VARCHAR(2), PRIMARY KEY, FOREIGN KEY) - References countries.country_id
+- `visited` (BOOLEAN, NOT NULL, DEFAULT FALSE) - Whether the country has been visited
+
+The database is pre-populated with all 50 US states. 
+
+Upon `docker compose up --build`, the database is populated with country names.
 
 ## API Endpoints
 
@@ -83,10 +94,36 @@ The database is pre-populated with all 50 US states.
     ]
     ```
 
+### Country Management
+- `GET /api/get-countries` - Get all countries of the world (plus some other places, like Antarctica) with visit status
+   - Returns: Array of states with `country_id` (ISO-2), `country_name`, `continent`, and `visited` boolean
+   - Example response: 
+     ```json
+     [
+      { 
+         "country_id": "MX",
+         "country_name": "Mexico",
+         "continent": "North America",
+         "visited": true
+      }
+     ]
+     ```
+
 ### Visit Status Management
 - `POST /api/toggle-state-visit` - Toggle visit status for a state
   - Body: `{ "stateId": "CA", "visited": true }`
   - Returns: `{ "success": true }`
+
+- `POST /api/toggle-country-visit` - Toggle visit status for a country
+  - Body: `{ "countryId": "US", "visited": true}`
+  - Returns: `{ "success": true }`
+
+### Get Country List
+- `POST /api/insert-states` - Hit [REST countries API](https://restcountries.com/) to get list of countries and insert into Postgres database
+ - Returns: `{ "messages": "Countries synced" }`
+
+## External API References
+In addition to the list of countries from [REST countries API](https://restcountries.com/v3.1/all), this project also hits the code [endpoint](https://restcountries.com/v.3.1/alpha?codes={code}) to get the three-digit numerical code needed to fill in the world map.
 
 ## Development
 
@@ -112,6 +149,7 @@ The database is pre-populated with all 50 US states.
 
 The PostgreSQL database is automatically initialized with:
 - All 50 US states
+- List of 250 countries and other territories, geographical areas
 - Database schema with foreign key constraints
 - Automatic visit status tracking
 
@@ -144,19 +182,31 @@ travel-tracker/
 ├── src/
 │   ├── app/                 # Next.js app directory
 │   │   ├── api/            # API routes
-│   │   │   ├── get-states/ # States API endpoint
-│   │   │   └── toggle-state-visit/ # Visit status API endpoint
+│   │   │   ├── get-countries/ # Countries API endpoint
+│   │   │   └── get-states/ # States API endpoint
+|   |   |   └── insert-countries/ # Insert countries into Postgres database
+|   |   |   └── toggle-state-visit/ # Visit status API endpoint for states
+|   |   |   └── toggle-country-visit/ # Visit status API endpoint for countries
 │   │   └── ...
 │   ├── components/         # React components
-│   │   ├── states-table.tsx # States list with checkboxes
-│   │   ├── visit-kpis.tsx  # KPI display component
+|   |   ├── domestic-travel # Components specific to domestic travel
+|   |   |   └── states-table.tsx # States list with checkboxes
+│   │   |   └── usa-map.tsx  # Map of USA where states are filled if they've been visited
+|   |   ├── international-travel # Components specific to international travel
+|   |   |   └── states-table.tsx # Countries list with checkboxes
+│   │   |   └── world-map.tsx  # World map where countries are filled if they've been visited
+|   |   ├── site-header.tsx # Website name with switcher between displaying international and domestic travel
+|   |   ├── switcher.tsx # Switcher component to swap various states throughout the app
+|   |   ├── visit-kpis.tsx # Component to show count of visited places: can be used for states, countries, or continents
 │   │   └── ...
 │   ├── lib/
 │   │   └── db.ts          # Database utilities
+|   |   └── utils.ts       # Handle tailwind conflicts
 │   └── ...
 ├── docker-compose.yml      # Docker Compose configuration
 ├── Dockerfile             # Production Docker image
 ├── Dockerfile.dev         # Development Docker image
+├── Dockerfile.sync        # Runs country sync
 ├── init.sql              # Database initialization script
 └── ...
 ```

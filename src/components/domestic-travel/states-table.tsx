@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import VisitKPIs from './visit-kpis';
+import VisitKPIs from '../visit-kpis';
 
 interface USState {
   state_id: string;
@@ -42,7 +42,6 @@ export default function StatesTable({ onStatesChange }: StatesTableProps) {
       onStatesChange?.(updatedStates);
     } catch (err) {
       console.error('Error updating visit status:', err);
-      // You could add a toast notification here
     }
   };
 

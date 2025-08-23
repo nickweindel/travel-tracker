@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import USAMap from "react-usa-map";
+import USAMap from 'react-usa-map';
 
 interface USState {
   state_id: string;
