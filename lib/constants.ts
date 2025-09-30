@@ -1,0 +1,1 @@
+export const MAP_FILL = "#3B82F6"
