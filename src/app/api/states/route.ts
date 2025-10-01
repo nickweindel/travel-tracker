@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to fetch records' }, { status: 500 });
     }
 
-    return NextResponse.json({ arenas: data });
+    return NextResponse.json({ states: data });
   } catch (error) {
     console.error('Error fetching state visits:', error)
     return NextResponse.json(
