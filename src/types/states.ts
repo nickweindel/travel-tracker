@@ -3,4 +3,4 @@ export interface StateVisit {
     state_id: string;
     state_name: string;
     visited: boolean;
-  }
+}

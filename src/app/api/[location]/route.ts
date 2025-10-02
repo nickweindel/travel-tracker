@@ -5,11 +5,14 @@ export async function GET(request: NextRequest) {
   const supabase = await createClient(); 
 
   try {
-    const { searchParams } = new URL(request.url);
+    const { searchParams, pathname } = new URL(request.url);
+    const [, , location] = pathname.split("/");
     const user = searchParams.get('user');
 
+    const viewName = `vw_${location}_with_visit_status`
+
     const { data, error } = await supabase
-    .from('vw_states_with_visit_status')
+    .from(viewName)
     .select('*')
     .eq('user_id', user)
 
@@ -18,11 +21,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to fetch records' }, { status: 500 });
     }
 
-    return NextResponse.json({ states: data });
+    return NextResponse.json({ visits: data });
   } catch (error) {
-    console.error('Error fetching state visits:', error)
+    console.error(`Error fetching ${location} visits:`, error)
     return NextResponse.json(
-      { error: 'Failed to fetch state visits' },
+      { error: `Failed to fetch ${location} visits` },
       { status: 500 }
     )
   }
