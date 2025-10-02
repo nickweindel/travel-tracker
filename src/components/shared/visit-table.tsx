@@ -9,7 +9,12 @@ import {
     TableRow
 } from "@/components/ui/table";
 
-type TravelTableProps = (
+type TravelTableBase = {
+    user: string;
+    fetchVisits: () => void;
+}
+
+type TravelTableProps = TravelTableBase & (
   | {
       location: "states";
       data: StateVisit[];
@@ -20,7 +25,43 @@ type TravelTableProps = (
     }
 );
 
-export function VisitTable({ location, data }: TravelTableProps) {
+export function VisitTable({ location, data, user, fetchVisits }: TravelTableProps) {
+    async function updateVisitStatus({
+        location,
+        id,
+        userId,
+        visited,
+      }: {
+        location: "states" | "countries";
+        id: string;
+        userId: string;
+        visited: boolean;
+      }) {
+        try {
+          const res = await fetch(`/api/${location}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              id,
+              user_id: userId,
+              visited,
+            }),
+          });
+      
+          if (!res.ok) {
+            const errorData = await res.json();
+            console.error("Failed to update visit status:", errorData.error);
+            throw new Error(errorData.error || "Unknown error");
+          }
+      
+          fetchVisits();
+          return true;
+        } catch (error) {
+          console.error("Error updating visit status:", error);
+          return false;
+        }
+      }
+
     return (
         <>
             <Table>
@@ -34,7 +75,14 @@ export function VisitTable({ location, data }: TravelTableProps) {
                             <TableCell className="w-[25%]">{country.continent}</TableCell>
                             <TableCell className="w-[25%]">
                                 <Checkbox
-                                    onCheckedChange={() => console.log(country.country_id)} 
+                                    onCheckedChange={async (checked) => {
+                                        await updateVisitStatus({
+                                          location: location,
+                                          id: country.country_id,
+                                          userId: user,
+                                          visited: checked === true,
+                                        });
+                                      }}
                                     checked={country.visited} />
                             </TableCell>
                         </TableRow>
@@ -49,7 +97,14 @@ export function VisitTable({ location, data }: TravelTableProps) {
                             <TableCell className="font-medium w-[75%]">{state.state_name}</TableCell>
                             <TableCell className="w-[25%]">
                                 <Checkbox
-                                    onCheckedChange={() => console.log(state.state_id)} 
+                                    onCheckedChange={async (checked) => {
+                                        await updateVisitStatus({
+                                          location: location,
+                                          id: state.state_id,
+                                          userId: user,
+                                          visited: checked === true,
+                                        });
+                                      }}
                                     checked={state.visited} />
                             </TableCell>
                         </TableRow>

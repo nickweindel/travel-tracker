@@ -65,9 +65,17 @@ export default function PageClient({ user }: { user: any }) {
         {isLoading ? (
           <Skeleton className="h-full w-full" />
         ) : statesOrCountries === "states" ? (
-          <VisitTable location="states" data={visitData as StateVisit[]} />
+          <VisitTable 
+            location="states" 
+            data={visitData as StateVisit[]} 
+            user={user}
+            fetchVisits={fetchVisits} />
         ) : (
-          <VisitTable location="countries" data={visitData as CountryVisit[]} />
+          <VisitTable 
+            location="countries" 
+            data={visitData as CountryVisit[]} 
+            user={user}
+            fetchVisits={fetchVisits} />
         )}
         </div>
       </div>
