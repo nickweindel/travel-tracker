@@ -6,15 +6,19 @@ import { PageHeader } from "@/components/shared/page-header";
 import { Selector } from "@/components/shared/selector";
 import { Skeleton } from "@/components/ui/skeleton";
 import { VisitTable } from "@/components/shared/visit-table";
+import { VisitKpi } from "@/components/shared/visit-kpis";
 
-import { CountryVisit } from "@/types/countries";
-import { StateVisit } from "@/types/states";
+import { ContinentKpi } from "@/types/continents";
+import { CountryVisit, CountryKpi } from "@/types/countries";
+import { StateVisit, StateKpi } from "@/types/states";
 
 export default function PageClient({ user }: { user: any }) {
   const [internationalOrDomestic, setInternationalOrDomestic] = useState("Domestic");
   const [countryOrContinent, setCountryOrContinent] = useState("Country");
   const [statesOrCountries, setStatesOrCountries] = useState<"states" | "countries">("states");
+  const [visitKpiDimension, setVisitKpiDimension] = useState<"states" | "countries" | "continents">("states");
   const [visitData, setVisitData] = useState<StateVisit[] | CountryVisit[]>([]);
+  const [kpiData, setKpiData] = useState<StateKpi | CountryKpi | ContinentKpi | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // Function to fetch state or country visit data.
@@ -29,7 +33,6 @@ export default function PageClient({ user }: { user: any }) {
       const data = await response.json();
       if (response.ok) {
         const visitData = data.visits;
-        console.log(visitData);
         setVisitData(visitData);
       } else {
         console.error(`Error fetching ${statesOrCountries}:`, data.error);
@@ -42,8 +45,38 @@ export default function PageClient({ user }: { user: any }) {
   };
 
   useEffect(() => {
-    fetchVisits()
+    fetchVisits();
   }, [internationalOrDomestic]);
+
+  // Function to fetch visit KPIs.
+  const fetchVisitKpis = async () => {
+    console.log(statesOrCountries)
+    const dimension = statesOrCountries === "states" ? "states" 
+      : countryOrContinent === "Country" ? "countries" : "continents";
+
+    setVisitKpiDimension(dimension);
+
+    try {
+      console.log("HI")
+      setIsLoading(true);
+      const response = await fetch(`api/${visitKpiDimension}/kpi?user=${user}`);
+      const data = await response.json();
+      if (response.ok) {
+        const kpiData = data.kpis;
+        setKpiData(kpiData);
+      } else {
+        console.error(`Error fetching KPIs:`, data.error);
+      }
+    } catch (error) {
+      console.error('Error fetching games:', error)
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchVisitKpis();
+  }, [internationalOrDomestic, countryOrContinent, visitData, visitKpiDimension, statesOrCountries]);
 
   return (
     <div className="flex flex-col h-screen">
@@ -61,22 +94,33 @@ export default function PageClient({ user }: { user: any }) {
           onValueChange={setInternationalOrDomestic} />
       </div>
       <div className="flex flex-row gap-3 p-3 flex-1 overflow-hidden">
+
         <div className="w-[33%] overflow-y-auto scrollbar-hidden">
-        {isLoading ? (
-          <Skeleton className="h-full w-full" />
-        ) : statesOrCountries === "states" ? (
-          <VisitTable 
-            location="states" 
-            data={visitData as StateVisit[]} 
-            user={user}
-            fetchVisits={fetchVisits} />
-        ) : (
-          <VisitTable 
-            location="countries" 
-            data={visitData as CountryVisit[]} 
-            user={user}
-            fetchVisits={fetchVisits} />
-        )}
+          <div className="flex flex-col gap-3">
+            {isLoading ? (
+              <Skeleton className="h-full w-full" />
+            ) : (
+              <VisitKpi 
+                visitKpiDimension={visitKpiDimension}
+                visitedValue={kpiData?.[`${visitKpiDimension}_visited` as keyof (StateKpi | CountryKpi | ContinentKpi)]}
+                notVisitedValue={kpiData?.[`${visitKpiDimension}_not_visited` as keyof (StateKpi | CountryKpi | ContinentKpi)]} />
+            )}
+            {isLoading ? (
+              <Skeleton className="h-full w-full" />
+            ) : statesOrCountries === "states" ? (
+              <VisitTable 
+                location="states" 
+                data={visitData as StateVisit[]} 
+                user={user}
+                fetchVisits={fetchVisits} />
+            ) : (
+              <VisitTable 
+                location="countries" 
+                data={visitData as CountryVisit[]} 
+                user={user}
+                fetchVisits={fetchVisits} />
+            )}
+          </div>
         </div>
       </div>
     </div>

@@ -5,3 +5,8 @@ export interface CountryVisit {
     continent: string;
     visited: boolean;
 }
+
+export interface CountryKpi {
+    countries_visited: number;
+    countries_not_visited: number;
+}

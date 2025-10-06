@@ -63,7 +63,7 @@ export function VisitTable({ location, data, user, fetchVisits }: TravelTablePro
       }
 
     return (
-        <>
+        <div className="border rounded">
             <Table>
                 <TableBody>
                     {location === "countries" &&
@@ -112,6 +112,6 @@ export function VisitTable({ location, data, user, fetchVisits }: TravelTablePro
                     })}
                 </TableBody>
             </Table>
-        </>
+        </div>
     );
 }

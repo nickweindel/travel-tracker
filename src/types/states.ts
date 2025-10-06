@@ -4,3 +4,8 @@ export interface StateVisit {
     state_name: string;
     visited: boolean;
 }
+
+export interface StateKpi {
+    states_visited: number;
+    states_not_visited: number;
+}
