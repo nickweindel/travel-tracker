@@ -57,7 +57,6 @@ export default function PageClient({ user }: { user: any }) {
     setVisitKpiDimension(dimension);
 
     try {
-      console.log("HI")
       setIsLoading(true);
       const response = await fetch(`api/${visitKpiDimension}/kpi?user=${user}`);
       const data = await response.json();
@@ -96,31 +95,29 @@ export default function PageClient({ user }: { user: any }) {
       <div className="flex flex-row gap-3 p-3 flex-1 overflow-hidden">
 
         <div className="w-[33%] overflow-y-auto scrollbar-hidden">
-          <div className="flex flex-col gap-3">
-            {isLoading ? (
-              <Skeleton className="h-full w-full" />
-            ) : (
+          {isLoading ? (
+            <Skeleton className="h-full w-full" />
+          ) : (
+            <div className="flex flex-col gap-3">
               <VisitKpi 
                 visitKpiDimension={visitKpiDimension}
                 visitedValue={kpiData?.[`${visitKpiDimension}_visited` as keyof (StateKpi | CountryKpi | ContinentKpi)]}
                 notVisitedValue={kpiData?.[`${visitKpiDimension}_not_visited` as keyof (StateKpi | CountryKpi | ContinentKpi)]} />
-            )}
-            {isLoading ? (
-              <Skeleton className="h-full w-full" />
-            ) : statesOrCountries === "states" ? (
-              <VisitTable 
-                location="states" 
-                data={visitData as StateVisit[]} 
-                user={user}
-                fetchVisits={fetchVisits} />
-            ) : (
-              <VisitTable 
-                location="countries" 
-                data={visitData as CountryVisit[]} 
-                user={user}
-                fetchVisits={fetchVisits} />
-            )}
-          </div>
+              {statesOrCountries === "states" ? (
+                <VisitTable 
+                  location="states" 
+                  data={visitData as StateVisit[]} 
+                  user={user}
+                  fetchVisits={fetchVisits} />
+              ) : (
+                <VisitTable 
+                  location="countries" 
+                  data={visitData as CountryVisit[]} 
+                  user={user}
+                  fetchVisits={fetchVisits} />
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
