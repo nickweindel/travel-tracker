@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import UsaMap from "@/components/shared/map/usa";
 import { VisitTable } from "@/components/shared/visit-table";
 import { VisitKpi } from "@/components/shared/visit-kpis";
+import WorldMap from "@/components/shared/map/world";
 
 import { ContinentKpi } from "@/types/continents";
 import { CountryVisit, CountryKpi } from "@/types/countries";
@@ -100,6 +101,7 @@ export default function PageClient({ user }: { user: any }) {
             <Skeleton className="h-full w-full" />
           ) : (
             <div className="flex flex-col gap-3">
+              {/* FIXME: this intermittently shows as undefined -- specifically continents */}
               <VisitKpi 
                 visitKpiDimension={visitKpiDimension}
                 visitedValue={kpiData?.[`${visitKpiDimension}_visited` as keyof (StateKpi | CountryKpi | ContinentKpi)]}
@@ -124,15 +126,13 @@ export default function PageClient({ user }: { user: any }) {
           {isLoading ? (
             <Skeleton className="w-full h-full" />
           ) : (
-            statesOrCountries === "states" ? (
-              <div className="w-full h-full border rounded">
-                <UsaMap states={visitData as StateVisit[]} />
-              </div>
-            ) : (
-              <div>
-                Hello World!
-              </div>
-            )
+            <div className="w-full h-full border rounded">
+              {statesOrCountries === "states" ? (
+                  <UsaMap states={visitData as StateVisit[]} />
+              ) : (
+                  <WorldMap countries={visitData as CountryVisit[]} />
+              )}
+            </div>
           )}
         </div>
       </div>
