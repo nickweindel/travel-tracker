@@ -1,57 +1,18 @@
-"use client";
+import { createClient } from '@/lib/supabase/server';
+import { redirect } from 'next/navigation';
+import PageClient from '@/components/page-client';
 
-import { useState } from "react";
-import { SiteHeader, TravelType } from "@/components/site-header";
+export default async function Page() {
+  const supabase = await createClient();
 
-// Domestic travel components.
-import StatesTable from "@/components/domestic-travel/states-table";
-import UsaMap from "@/components/domestic-travel/usa-map";
+  const { data, error } = await supabase.auth.getClaims();
 
-// International travel components.
-import CountriesTable from "@/components/international-travel/countries-table";
-import WorldMap from "@/components/international-travel/world-map";
+  if (error || !data?.claims) {
+    redirect('/auth/login');
+  }
 
-interface USState {
-  state_id: string;
-  state_name: string;
-  visited: boolean;
-}
+  // You can also get user metadata here if needed
+  const user = data.claims.email;
 
-interface Country {
-  country_id: string;
-  country_name: string;
-  continent: string;
-  visited: boolean;
-}
-
-export default function Home() {
-  const [travelType, setTravelType] = useState<TravelType>("Domestic");
-  const [states, setStates] = useState<USState[]>([]);
-  const [countries, setCountries] = useState<Country[]>([]);
-
-  return (
-    <div className="flex flex-col h-screen overflow-hidden">
-      <div className="h-[80px] flex-shrink-0">
-        <SiteHeader travelType={travelType} setTravelType={setTravelType}/>
-      </div>
-      <div className="flex flex-1 overflow-hidden">
-        <div className="w-1/3 p-4 flex flex-col">
-          {travelType === "Domestic" ? (
-            <StatesTable onStatesChange={setStates} />
-          ) : (
-            <CountriesTable onCountriesChange={setCountries} />
-          )}
-        </div>
-        <div className="w-2/3 p-4 flex flex-col">
-          <div className="h-full bg-white rounded-lg border border-gray-200 p-4 flex justify-center items-center">
-            {travelType === "Domestic" ? (
-              <UsaMap states={states} />
-            ) : (
-              <WorldMap countries={countries} />
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  return <PageClient user={user} />;
 }

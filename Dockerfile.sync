@@ -1,8 +1,0 @@
-FROM alpine:latest
-
-RUN apk add --no-cache curl
-
-COPY sync-countries.sh /sync-countries.sh
-RUN chmod +x /sync-countries.sh
-
-ENTRYPOINT ["/sync-countries.sh"]
