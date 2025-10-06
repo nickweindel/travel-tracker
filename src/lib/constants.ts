@@ -1,1 +1,1 @@
-export const MAP_FILL = "#3B82F6"
+export const MAP_FILL = "rgb(75 85 99)"

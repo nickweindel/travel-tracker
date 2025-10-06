@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { PageHeader } from "@/components/shared/page-header";
 import { Selector } from "@/components/shared/selector";
 import { Skeleton } from "@/components/ui/skeleton";
+import UsaMap from "@/components/shared/map/usa";
 import { VisitTable } from "@/components/shared/visit-table";
 import { VisitKpi } from "@/components/shared/visit-kpis";
 
@@ -117,6 +118,21 @@ export default function PageClient({ user }: { user: any }) {
                   fetchVisits={fetchVisits} />
               )}
             </div>
+          )}
+        </div>
+        <div className="w-[67%] h-full">
+          {isLoading ? (
+            <Skeleton className="w-full h-full" />
+          ) : (
+            statesOrCountries === "states" ? (
+              <div className="w-full h-full border rounded">
+                <UsaMap states={visitData as StateVisit[]} />
+              </div>
+            ) : (
+              <div>
+                Hello World!
+              </div>
+            )
           )}
         </div>
       </div>
