@@ -27,12 +27,12 @@ export default function WorldMap({ countries }: WorldMapProps) {
       const codes = visitedCountries.map(c => c.country_id).join(',');
 
       if (!codes) return;
-
+ 
       try {
         const res = await fetch(`https://restcountries.com/v3.1/alpha?codes=${codes}`);
         const data = await res.json();
 
-        const ccn3Set = new Set(
+        const ccn3Set = new Set<string>(
           data.map((c: any) => c.ccn3).filter(Boolean)
         );
 
@@ -48,8 +48,8 @@ export default function WorldMap({ countries }: WorldMapProps) {
   return (
     <ComposableMap projectionConfig={{ scale: 140 }}>
       <Geographies geography={geoUrl}>
-        {({ geographies }) =>
-          geographies.map(geo => {
+        {({ geographies }: { geographies: any[]}) =>
+          geographies.map((geo: any) => {
             const countryId = geo.id; // This is the numeric id (e.g., 840 for USA)
             const isVisited = visitedCcn3.has(countryId);
 
