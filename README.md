@@ -53,7 +53,7 @@ create table public.us_states (
 │   ├── app/
 │   │   ├── api/
 │   │   │   ├── [location]/route.ts   # GET, PUT visits
-│   │   │   |   ├── kpi/route.ts      # GET counts of visited and not visited states, countries, and continents
+│   │   │   |   └──  kpi/route.ts     # GET counts of visited and not visited states, countries, and continents
 |   |   ├── auth/                     # Pages for performing auth actions (change password, login, etc.)
 │   │   ├── page.tsx                  # The only page in the app
 │   │   ├── layout.tsx
@@ -61,7 +61,7 @@ create table public.us_states (
 │   ├── components/
 |   |   ├── auth/                     # Auth components used in auth pages
 │   │   ├── shared/                   # Custom reusable components
-|   |   |   ├── map/                  # Maps of the USA and the world
+|   |   |   └── map/                  # Maps of the USA and the world
 │   │   └── ui/                       # ShadCN components
 │   ├── lib/
 |   |   ├── supabase                  # Supabase client, server, and middleware utilities
