@@ -1,105 +1,128 @@
-<a href="https://demo-nextjs-with-supabase.vercel.app/">
-  <img alt="Next.js and Supabase Starter Kit - the fastest way to build apps with Next.js and Supabase" src="https://demo-nextjs-with-supabase.vercel.app/opengraph-image.png">
-  <h1 align="center">Next.js and Supabase Starter Kit</h1>
-</a>
+# Travel Tracker
 
-<p align="center">
- The fastest way to build apps with Next.js and Supabase
-</p>
+A web application built with **Next.js**, **Supabase**, and **ShadCN UI** and deployed with **Vercel**, designed to track travel destinations. Users can mark countries and states as visited, see a map of their visits, and get an idea of how many states, countries, and continents they have left to visit.
 
-<p align="center">
-  <a href="#features"><strong>Features</strong></a> ·
-  <a href="#demo"><strong>Demo</strong></a> ·
-  <a href="#deploy-to-vercel"><strong>Deploy to Vercel</strong></a> ·
-  <a href="#clone-and-run-locally"><strong>Clone and run locally</strong></a> ·
-  <a href="#feedback-and-issues"><strong>Feedback and issues</strong></a>
-  <a href="#more-supabase-examples"><strong>More Examples</strong></a>
-</p>
-<br/>
+## Tech Stack
 
-## Features
+- **Frontend**: [Next.js](https://nextjs.org/) with [ShadCN UI](https://ui.shadcn.com/) and [Lucide Icons](https://lucide.dev/)
+- **Database**: [Supabase](https://supabase.com/)
+- **Package Manager**: [pnpm](https://pnpm.io/)
+- **Icons**: Lucide
+- **Deployment**: [Vercel](https://vercel.com/)
 
-- Works across the entire [Next.js](https://nextjs.org) stack
-  - App Router
-  - Pages Router
-  - Middleware
-  - Client
-  - Server
-  - It just works!
-- supabase-ssr. A package to configure Supabase Auth to use cookies
-- Password-based authentication block installed via the [Supabase UI Library](https://supabase.com/ui/docs/nextjs/password-based-auth)
-- Styling with [Tailwind CSS](https://tailwindcss.com)
-- Components with [shadcn/ui](https://ui.shadcn.com/)
-- Optional deployment with [Supabase Vercel Integration and Vercel deploy](#deploy-your-own)
-  - Environment variables automatically assigned to Vercel project
+---
 
-## Demo
+## Database Schema
 
-You can view a fully working demo at [demo-nextjs-with-supabase.vercel.app](https://demo-nextjs-with-supabase.vercel.app/).
+```sql
+create table public.countries (
+  country_id character varying(2) not null,
+  country_name character varying(100) not null,
+  continent character varying(13) not null,
+  constraint countries_pkey primary key (country_id)
+) TABLESPACE pg_default;
 
-## Deploy to Vercel
+create table public.countries_visited (
+  user_id character varying(100) not null,
+  country_id character varying(2) not null,
+  visited boolean not null default false,
+  constraint countries_visited_pkey primary key (user_id, country_id)
+) TABLESPACE pg_default;
 
-Vercel deployment will guide you through creating a Supabase account and project.
+create table public.states_visited (
+  user_id character varying(100) not null,
+  state_id character varying(2) not null,
+  visited boolean not null default false,
+  constraint states_visited_pkey primary key (user_id, state_id)
+) TABLESPACE pg_default;
 
-After installation of the Supabase integration, all relevant environment variables will be assigned to the project so the deployment is fully functioning.
+create table public.us_states (
+  state_id character varying(2) not null,
+  state_name character varying(14) not null,
+  constraint us_states_pkey primary key (state_id)
+) TABLESPACE pg_default;
+```
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&project-name=nextjs-with-supabase&repository-name=nextjs-with-supabase&demo-title=nextjs-with-supabase&demo-description=This+starter+configures+Supabase+Auth+to+use+cookies%2C+making+the+user%27s+session+available+throughout+the+entire+Next.js+app+-+Client+Components%2C+Server+Components%2C+Route+Handlers%2C+Server+Actions+and+Middleware.&demo-url=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2F&external-id=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&demo-image=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2Fopengraph-image.png)
+---
 
-The above will also clone the Starter kit to your GitHub, you can clone that locally and develop locally.
+## Project Structure
 
-If you wish to just develop locally and not deploy to Vercel, [follow the steps below](#clone-and-run-locally).
+```
+.
+├── src/
+│   ├── app/
+│   │   ├── api/
+│   │   │   ├── [location]/route.ts   # GET, PUT visits
+│   │   │   |   ├── kpi/route.ts      # GET counts of visited and not visited states, countries, and continents
+|   |   ├── auth/                     # Pages for performing auth actions (change password, login, etc.)
+│   │   ├── page.tsx                  # The only page in the app
+│   │   ├── layout.tsx
+│   │   └── globals.css
+│   ├── components/
+|   |   ├── auth/                     # Auth components used in auth pages
+│   │   ├── shared/                   # Custom reusable components
+|   |   |   ├── map/                  # Maps of the USA and the world
+│   │   └── ui/                       # ShadCN components
+│   ├── lib/
+|   |   ├── supabase                  # Supabase client, server, and middleware utilities
+│   │   ├── constants.ts
+│   │   └── utils.ts
+│   └── types/   
+├── package.json
+├── pnpm-lock.yaml
+└── README.md                    
+```
 
-## Clone and run locally
+## Local Development
 
-1. You'll first need a Supabase project which can be made [via the Supabase dashboard](https://database.new)
+### Prerequisites
 
-2. Create a Next.js app using the Supabase Starter template npx command
+- [Node.js](https://nodejs.org/) (v18+ recommended)
+- [pnpm](https://pnpm.io/)
 
+### Setup
+
+1. **Clone the repository**
    ```bash
-   npx create-next-app --example with-supabase with-supabase-app
+   git clone https://github.com/your-username/project-name.git
+   cd project-name
    ```
 
+2. **Install dependencies**
    ```bash
-   yarn create next-app --example with-supabase with-supabase-app
+   pnpm install
    ```
 
+3. **Run the development server**
    ```bash
-   pnpm create next-app --example with-supabase with-supabase-app
+   pnpm dev
    ```
 
-3. Use `cd` to change into the app's directory
+4. **Open the app in your browser**
+   http://localhost:3000
 
-   ```bash
-   cd with-supabase-app
-   ```
+---
 
-4. Rename `.env.example` to `.env.local` and update the following:
+## API Routes
 
-   ```
-   NEXT_PUBLIC_SUPABASE_URL=[INSERT SUPABASE PROJECT URL]
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=[INSERT SUPABASE PROJECT API ANON KEY]
-   ```
+| Route                       | Method | Description                                                                      |
+|-----------------------------|--------|----------------------------------------------------------------------------------|                        
+| `/api/[location]`           | GET    | Fetch visit data for states and countries                                        |
+| `/api/[location]`           | PUT    | Add or update if a state or country has been visited                             |
+| `/api/[location]/kpi`       | GET    | Fetch breakdown of number of states/countries/continents visited or not visited  |
 
-   Both `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` can be found in [your Supabase project's API settings](https://supabase.com/dashboard/project/_?showConnect=true)
+---
 
-5. You can now run the Next.js local development server:
+## Assets
 
-   ```bash
-   npm run dev
-   ```
+- Generic icons are stored directly in `/public`
+- Assets are used in UI components like dropdowns and cards
 
-   The starter kit should now be running on [localhost:3000](http://localhost:3000/).
+---
 
-6. This template comes with the default shadcn/ui style initialized. If you instead want other ui.shadcn styles, delete `components.json` and [re-install shadcn/ui](https://ui.shadcn.com/docs/installation/next)
+## Notes
 
-> Check out [the docs for Local Development](https://supabase.com/docs/guides/getting-started/local-development) to also run Supabase locally.
-
-## Feedback and issues
-
-Please file feedback and issues over on the [Supabase GitHub org](https://github.com/supabase/supabase/issues/new/choose).
-
-## More Supabase examples
-
-- [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments)
-- [Cookie-based Auth and the Next.js 13 App Router (free course)](https://youtube.com/playlist?list=PL5S4mPUpp4OtMhpnp93EFSo42iQ40XjbF)
-- [Supabase Auth and the Next.js App Router](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs)
+- The app is built using the **App Router** in Next.js (`/src/app`)
+- Currently functions as a single-page dashboard (`page.tsx`)
+- Uses modular API routes for fetching and updating visit data
+- The database table has a composite primary key to ensure uniqueness
