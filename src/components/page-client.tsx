@@ -52,7 +52,6 @@ export default function PageClient({ user }: { user: any }) {
 
   // Function to fetch visit KPIs.
   const fetchVisitKpis = async () => {
-    console.log(statesOrCountries)
     const dimension = statesOrCountries === "states" ? "states" 
       : countryOrContinent === "Country" ? "countries" : "continents";
 
@@ -60,7 +59,7 @@ export default function PageClient({ user }: { user: any }) {
 
     try {
       setIsLoading(true);
-      const response = await fetch(`api/${visitKpiDimension}/kpi?user=${user}`);
+      const response = await fetch(`api/${dimension}/kpi?user=${user}`);
       const data = await response.json();
       if (response.ok) {
         const kpiData = data.kpis;
@@ -101,7 +100,6 @@ export default function PageClient({ user }: { user: any }) {
             <Skeleton className="h-full w-full" />
           ) : (
             <div className="flex flex-col gap-3">
-              {/* FIXME: this intermittently shows as undefined -- specifically continents */}
               <VisitKpi 
                 visitKpiDimension={visitKpiDimension}
                 visitedValue={kpiData?.[`${visitKpiDimension}_visited` as keyof (StateKpi | CountryKpi | ContinentKpi)]}
