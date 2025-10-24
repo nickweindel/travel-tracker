@@ -7,7 +7,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-type SelectorCategory = "internationalOrDomestic" | "countryOrContinent"
+type SelectorCategory = "internationalOrDomestic" | "countryOrContinent" | "stateOrPark";
 
 interface SelectorProps {
   category: SelectorCategory;
@@ -20,7 +20,7 @@ export function Selector({ value, category, onValueChange }: SelectorProps) {
     "internationalOrDomestic": {
       "defaultValue": "Domestic",
       "options": {
-      "domestic": "Domestic",
+        "domestic": "Domestic",
         "international": "International",
       },
     },
@@ -30,7 +30,14 @@ export function Selector({ value, category, onValueChange }: SelectorProps) {
         "country": "Country",
         "continent": "Continent",
       },
-    }
+    },
+    "stateOrPark": {
+      "defaultValue": "State",
+      "options": {
+        "state": "State",
+        "national_park": "National Park",
+      },
+    },
   }
 
   return (

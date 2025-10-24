@@ -1,5 +1,6 @@
 import { StateVisit } from "@/types/states";
 import { CountryVisit } from "@/types/countries";
+import { ParkVisit } from "@/types/parks";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -23,6 +24,10 @@ type TravelTableProps = TravelTableBase & (
       location: "countries";
       data: CountryVisit[];
     }
+  | {
+      location: "national_parks";
+      data: ParkVisit[];
+    }
 );
 
 export function VisitTable({ location, data, user, fetchVisits }: TravelTableProps) {
@@ -32,7 +37,7 @@ export function VisitTable({ location, data, user, fetchVisits }: TravelTablePro
         userId,
         visited,
       }: {
-        location: "states" | "countries";
+        location: "states" | "countries" | "national_parks";
         id: string;
         userId: string;
         visited: boolean;
@@ -106,6 +111,28 @@ export function VisitTable({ location, data, user, fetchVisits }: TravelTablePro
                                         });
                                       }}
                                     checked={state.visited} />
+                            </TableCell>
+                        </TableRow>
+                        );
+                    })}
+
+                    {location === "national_parks" &&
+                    data.map((item) => {
+                        const park = item as ParkVisit;
+                        return (
+                        <TableRow key={park.park_id}>
+                            <TableCell className="font-medium w-[75%]">{park.park_name}</TableCell>
+                            <TableCell className="w-[25%]">
+                                <Checkbox
+                                    onCheckedChange={async (checked) => {
+                                        await updateVisitStatus({
+                                          location: location,
+                                          id: park.park_id,
+                                          userId: user,
+                                          visited: checked === true,
+                                        });
+                                      }}
+                                    checked={park.visited} />
                             </TableCell>
                         </TableRow>
                         );
