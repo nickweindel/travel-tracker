@@ -41,6 +41,19 @@ create table public.us_states (
   state_name character varying(14) not null,
   constraint us_states_pkey primary key (state_id)
 ) TABLESPACE pg_default;
+
+create table public.national_parks_visited (
+  user_id character varying(100) not null,
+  park_id character varying(4) not null,
+  visited boolean not null default false,
+  constraint parks_visited_pkey primary key (user_id, park_id)
+) TABLESPACE pg_default;
+
+create table public.us_national_parks (
+  park_id character varying(4) not null,
+  park_name character varying(255) null,
+  constraint us_national_parks_pk primary key (park_id)
+) TABLESPACE pg_default;
 ```
 
 ---
@@ -53,7 +66,7 @@ create table public.us_states (
 │   ├── app/
 │   │   ├── api/
 │   │   │   ├── [location]/route.ts   # GET, PUT visits
-│   │   │   |   └──  kpi/route.ts     # GET counts of visited and not visited states, countries, and continents
+│   │   │   |   └──  kpi/route.ts     # GET counts of visited and not visited states, countries, continents, and national parks
 |   |   ├── auth/                     # Pages for performing auth actions (change password, login, etc.)
 │   │   ├── page.tsx                  # The only page in the app
 │   │   ├── layout.tsx

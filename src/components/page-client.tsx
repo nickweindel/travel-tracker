@@ -13,18 +13,48 @@ import WorldMap from "@/components/shared/map/world";
 import { ContinentKpi } from "@/types/continents";
 import { CountryVisit, CountryKpi } from "@/types/countries";
 import { StateVisit, StateKpi } from "@/types/states";
+import { ParkVisit, ParkKpi } from "@/types/parks";
 
 export default function PageClient({ user }: { user: any }) {
   const [internationalOrDomestic, setInternationalOrDomestic] = useState("Domestic");
   const [countryOrContinent, setCountryOrContinent] = useState("Country");
+  const [stateOrPark, setStateOrPark] = useState("State");
   const [statesOrCountries, setStatesOrCountries] = useState<"states" | "countries">("states");
-  const [visitKpiDimension, setVisitKpiDimension] = useState<"states" | "countries" | "continents">("states");
-  const [visitData, setVisitData] = useState<StateVisit[] | CountryVisit[]>([]);
+  const [visitKpiDimension, setVisitKpiDimension] = useState<"states" | "countries" | "continents" | "national_parks">("states");
+  const [tableVisitData, setTableVisitData] = useState<StateVisit[] | CountryVisit[] | ParkVisit[]>([]);
+  const [mapVisitData, setMapVisitData] = useState<StateVisit[] | CountryVisit[]>([]);
   const [kpiData, setKpiData] = useState<StateKpi | CountryKpi | ContinentKpi | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // Function to fetch state or country visit data.
-  const fetchVisits = async () => {
+  // Function to fetch state, country, or national park visit data to display on the clickable table.
+  const fetchTableVisitData = async () => {
+    const visitLocation = internationalOrDomestic === "Domestic" ? 
+      stateOrPark === "State" ? "states" : "national_parks"
+      : "countries"
+  
+    try {
+      setIsLoading(true);
+      const response = await fetch(`api/${visitLocation}?user=${user}`);
+      const data = await response.json();
+      if (response.ok) {
+        const visitData = data.visits;
+        setTableVisitData(visitData);
+      } else {
+        console.error(`Error fetching ${visitLocation}:`, data.error);
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error)
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTableVisitData();
+  }, [internationalOrDomestic, stateOrPark])
+
+  // Function to fetch state or country visit data for display on the maps.
+  const fetchMapVisitData = async () => {
     const visitLocation = internationalOrDomestic === "Domestic" ? "states" : "countries";
 
     setStatesOrCountries(visitLocation);
@@ -35,25 +65,31 @@ export default function PageClient({ user }: { user: any }) {
       const data = await response.json();
       if (response.ok) {
         const visitData = data.visits;
-        setVisitData(visitData);
+        setMapVisitData(visitData);
       } else {
         console.error(`Error fetching ${statesOrCountries}:`, data.error);
       }
     } catch (error) {
-      console.error('Error fetching games:', error)
+      console.error('Error fetching data:', error)
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchVisits();
+    fetchMapVisitData();
   }, [internationalOrDomestic]);
 
   // Function to fetch visit KPIs.
   const fetchVisitKpis = async () => {
-    const dimension = statesOrCountries === "states" ? "states" 
-      : countryOrContinent === "Country" ? "countries" : "continents";
+    const dimension =
+      internationalOrDomestic === "Domestic"
+        ? stateOrPark === "State"
+          ? "states"
+          : "national_parks"
+        : countryOrContinent === "Country"
+        ? "countries"
+        : "continents";
 
     setVisitKpiDimension(dimension);
 
@@ -68,7 +104,7 @@ export default function PageClient({ user }: { user: any }) {
         console.error(`Error fetching KPIs:`, data.error);
       }
     } catch (error) {
-      console.error('Error fetching games:', error)
+      console.error('Error fetching data:', error)
     } finally {
       setIsLoading(false);
     }
@@ -76,18 +112,23 @@ export default function PageClient({ user }: { user: any }) {
 
   useEffect(() => {
     fetchVisitKpis();
-  }, [internationalOrDomestic, countryOrContinent, visitData, visitKpiDimension, statesOrCountries]);
+  }, [internationalOrDomestic, countryOrContinent, tableVisitData, visitKpiDimension, statesOrCountries, stateOrPark]);
 
   return (
     <div className="flex flex-col h-screen">
       <PageHeader user={user} />
       <div className="flex flex-row gap-3 p-3 justify-end">
-        {internationalOrDomestic === "International" && (
+        {internationalOrDomestic === "International" ? (
           <Selector 
             category="countryOrContinent"
             value={countryOrContinent}
             onValueChange={setCountryOrContinent} />
-        )}
+        ) : 
+          <Selector
+            category="stateOrPark"
+            value={stateOrPark}
+            onValueChange={setStateOrPark} />
+        }
         <Selector 
           category="internationalOrDomestic"
           value={internationalOrDomestic}
@@ -102,20 +143,31 @@ export default function PageClient({ user }: { user: any }) {
             <div className="flex flex-col gap-3">
               <VisitKpi 
                 visitKpiDimension={visitKpiDimension}
-                visitedValue={kpiData?.[`${visitKpiDimension}_visited` as keyof (StateKpi | CountryKpi | ContinentKpi)]}
-                notVisitedValue={kpiData?.[`${visitKpiDimension}_not_visited` as keyof (StateKpi | CountryKpi | ContinentKpi)]} />
-              {statesOrCountries === "states" ? (
-                <VisitTable 
-                  location="states" 
-                  data={visitData as StateVisit[]} 
-                  user={user}
-                  fetchVisits={fetchVisits} />
+                visitedValue={kpiData?.[`${visitKpiDimension}_visited` as keyof (StateKpi | CountryKpi | ContinentKpi | ParkKpi)]}
+                notVisitedValue={kpiData?.[`${visitKpiDimension}_not_visited` as keyof (StateKpi | CountryKpi | ContinentKpi | ParkKpi)]} />
+              {internationalOrDomestic === "Domestic" ? (
+                stateOrPark === "State" ? (
+                  <VisitTable
+                    location="states"
+                    data={tableVisitData as StateVisit[]}
+                    user={user}
+                    fetchVisits={fetchTableVisitData}
+                  />
+                ) : (
+                  <VisitTable
+                    location="national_parks"
+                    data={tableVisitData as ParkVisit[]}
+                    user={user}
+                    fetchVisits={fetchTableVisitData}
+                  />
+                )
               ) : (
-                <VisitTable 
-                  location="countries" 
-                  data={visitData as CountryVisit[]} 
+                <VisitTable
+                  location="countries"
+                  data={tableVisitData as CountryVisit[]}
                   user={user}
-                  fetchVisits={fetchVisits} />
+                  fetchVisits={fetchTableVisitData}
+                />
               )}
             </div>
           )}
@@ -125,10 +177,10 @@ export default function PageClient({ user }: { user: any }) {
             <Skeleton className="w-full h-full" />
           ) : (
             <div className="w-full h-full border rounded">
-              {statesOrCountries === "states" ? (
-                  <UsaMap states={visitData as StateVisit[]} />
+              {internationalOrDomestic === "Domestic" ? (
+                  <UsaMap states={mapVisitData as StateVisit[]} />
               ) : (
-                  <WorldMap countries={visitData as CountryVisit[]} />
+                  <WorldMap countries={mapVisitData as CountryVisit[]} />
               )}
             </div>
           )}
