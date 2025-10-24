@@ -39,7 +39,8 @@ export async function PUT(request: NextRequest) {
     const [, , location] = pathname.split("/");
 
     const tableName = `${location}_visited`; 
-    const columnPrefix = location === "states" ? "state" : "country";
+    const columnPrefix = location === "states" ? "state" :
+      location === "national_parks" ? "park" : "country";
     const idField = `${columnPrefix}_id`; 
 
     const { id, user_id, visited } = await request.json();

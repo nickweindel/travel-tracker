@@ -16,7 +16,10 @@ interface VisitKpiProps {
 }
 
 export function VisitKpi({ visitKpiDimension, visitedValue, notVisitedValue } : VisitKpiProps ) {
-    const cardDescription = visitKpiDimension.charAt(0).toUpperCase() + visitKpiDimension.slice(1);
+    const cardDescription = visitKpiDimension
+        .split("_") 
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
     const percentVisited = visitedValue && notVisitedValue
         ? numeral(visitedValue / (visitedValue + notVisitedValue)).format("0%")
         : "0%";
