@@ -78,7 +78,7 @@ export default function PageClient({ user }: { user: any }) {
 
   useEffect(() => {
     fetchMapVisitData();
-  }, [internationalOrDomestic]);
+  }, [internationalOrDomestic, tableVisitData]);
 
   // Function to fetch visit KPIs.
   const fetchVisitKpis = async () => {
@@ -178,9 +178,9 @@ export default function PageClient({ user }: { user: any }) {
           ) : (
             <div className="w-full h-full border rounded">
               {internationalOrDomestic === "Domestic" ? (
-                  <UsaMap states={mapVisitData as StateVisit[]} />
+                  <UsaMap states={mapVisitData as StateVisit[]} /> // TODO: this map should only have a loading state when toggling between international and domestic travel
               ) : (
-                  <WorldMap countries={mapVisitData as CountryVisit[]} />
+                  <WorldMap countries={mapVisitData as CountryVisit[]} /> // TODO: this map should only have a loading state when toggling between international and domestic travel
               )}
             </div>
           )}
