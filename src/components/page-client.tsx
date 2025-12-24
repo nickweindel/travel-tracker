@@ -1,3 +1,8 @@
+// TODO: implement some more logic for loading
+// If switching between international and domestic, set everything to loading.
+// If switching between states and national parks, set table and KPIs to loading (not map).
+// If switching between countries and continents set KPIs to loading (not table or map).
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -19,69 +24,33 @@ export default function PageClient({ user }: { user: any }) {
   const [internationalOrDomestic, setInternationalOrDomestic] = useState("Domestic");
   const [countryOrContinent, setCountryOrContinent] = useState("Country");
   const [stateOrPark, setStateOrPark] = useState("State");
-  const [statesOrCountries, setStatesOrCountries] = useState<"states" | "countries">("states");
   const [visitKpiDimension, setVisitKpiDimension] = useState<"states" | "countries" | "continents" | "national_parks">("states");
   const [tableVisitData, setTableVisitData] = useState<StateVisit[] | CountryVisit[] | ParkVisit[]>([]);
   const [mapVisitData, setMapVisitData] = useState<StateVisit[] | CountryVisit[]>([]);
   const [kpiData, setKpiData] = useState<StateKpi | CountryKpi | ContinentKpi | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  // Function to fetch state, country, or national park visit data to display on the clickable table.
   const fetchTableVisitData = async () => {
-    const visitLocation = internationalOrDomestic === "Domestic" ? 
-      stateOrPark === "State" ? "states" : "national_parks"
-      : "countries"
+    const visitLocation =
+      internationalOrDomestic === "Domestic"
+        ? stateOrPark === "State" ? "states" : "national_parks"
+        : "countries";
   
-    try {
-      setIsLoading(true);
-      const response = await fetch(`api/${visitLocation}?user=${user}`);
-      const data = await response.json();
-      if (response.ok) {
-        const visitData = data.visits;
-        setTableVisitData(visitData);
-      } else {
-        console.error(`Error fetching ${visitLocation}:`, data.error);
-      }
-    } catch (error) {
-      console.error('Error fetching data:', error)
-    } finally {
-      setIsLoading(false);
-    }
+    const response = await fetch(`api/${visitLocation}?user=${user}`);
+    const data = await response.json();
+    return data.visits;
   };
-
-  useEffect(() => {
-    fetchTableVisitData();
-  }, [internationalOrDomestic, stateOrPark])
-
-  // Function to fetch state or country visit data for display on the maps.
+  
   const fetchMapVisitData = async () => {
-    const visitLocation = internationalOrDomestic === "Domestic" ? "states" : "countries";
-
-    setStatesOrCountries(visitLocation);
-
-    try {
-      setIsLoading(true);
-      const response = await fetch(`api/${visitLocation}?user=${user}`);
-      const data = await response.json();
-      if (response.ok) {
-        const visitData = data.visits;
-        setMapVisitData(visitData);
-      } else {
-        console.error(`Error fetching ${statesOrCountries}:`, data.error);
-      }
-    } catch (error) {
-      console.error('Error fetching data:', error)
-    } finally {
-      setIsLoading(false);
-    }
+    const visitLocation =
+      internationalOrDomestic === "Domestic" ? "states" : "countries";
+  
+    const response = await fetch(`api/${visitLocation}?user=${user}`);
+    const data = await response.json();
+    return data.visits;
   };
-
-  useEffect(() => {
-    fetchMapVisitData();
-  }, [internationalOrDomestic, tableVisitData]);
-
-  // Function to fetch visit KPIs.
-  const fetchVisitKpis = async () => {
+  
+  const fetchVisitKpiData = async () => {
     const dimension =
       internationalOrDomestic === "Domestic"
         ? stateOrPark === "State"
@@ -90,29 +59,74 @@ export default function PageClient({ user }: { user: any }) {
         : countryOrContinent === "Country"
         ? "countries"
         : "continents";
-
-    setVisitKpiDimension(dimension);
-
-    try {
-      setIsLoading(true);
-      const response = await fetch(`api/${dimension}/kpi?user=${user}`);
-      const data = await response.json();
-      if (response.ok) {
-        const kpiData = data.kpis;
-        setKpiData(kpiData);
-      } else {
-        console.error(`Error fetching KPIs:`, data.error);
-      }
-    } catch (error) {
-      console.error('Error fetching data:', error)
-    } finally {
-      setIsLoading(false);
-    }
+  
+    const response = await fetch(`api/${dimension}/kpi?user=${user}`);
+    const data = await response.json();
+    return data.kpis;
   };
-
+  
+  // Refresh everything with a loading skeleton.
   useEffect(() => {
-    fetchVisitKpis();
-  }, [internationalOrDomestic, countryOrContinent, tableVisitData, visitKpiDimension, statesOrCountries, stateOrPark]);
+    let cancelled = false;
+  
+    const run = async () => {
+      setIsLoading(true);
+  
+      try {
+        const [table, map, kpi] = await Promise.all([
+          fetchTableVisitData(),
+          fetchMapVisitData(),
+          fetchVisitKpiData(),
+        ]);
+  
+        if (!cancelled) {
+          setTableVisitData(table);
+          setMapVisitData(map);
+          setKpiData(kpi);
+        }
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    };
+  
+    run();
+    return () => { cancelled = true; }
+  }, [
+    internationalOrDomestic,
+    stateOrPark,
+    countryOrContinent
+  ]);
+
+  // Change the visit KPI dimension.
+  useEffect(() => {
+    if (internationalOrDomestic === "Domestic") {
+      if (stateOrPark === "State") {
+        setVisitKpiDimension("states");
+      } else {
+        setVisitKpiDimension("national_parks");
+      }
+    } else {
+      if (countryOrContinent === "Country") {
+        setVisitKpiDimension("countries");
+      } else {
+        setVisitKpiDimension("continents");
+      }
+    }
+  }, [internationalOrDomestic, stateOrPark, countryOrContinent]);
+
+  // Refresh everything but do not show a loading skeleton. 
+  const silentRefreshAll = async () => {
+    const [table, map, kpi] = await Promise.all([
+      fetchTableVisitData(),
+      fetchMapVisitData(),
+      fetchVisitKpiData(),
+    ]);
+  
+    setTableVisitData(table);
+    setMapVisitData(map);
+    setKpiData(kpi);
+  };
+  
 
   return (
     <div className="flex flex-col h-screen">
@@ -151,14 +165,14 @@ export default function PageClient({ user }: { user: any }) {
                     location="states"
                     data={tableVisitData as StateVisit[]}
                     user={user}
-                    fetchVisits={fetchTableVisitData}
+                    fetchVisits={silentRefreshAll}
                   />
                 ) : (
                   <VisitTable
                     location="national_parks"
                     data={tableVisitData as ParkVisit[]}
                     user={user}
-                    fetchVisits={fetchTableVisitData}
+                    fetchVisits={silentRefreshAll}
                   />
                 )
               ) : (
@@ -166,7 +180,7 @@ export default function PageClient({ user }: { user: any }) {
                   location="countries"
                   data={tableVisitData as CountryVisit[]}
                   user={user}
-                  fetchVisits={fetchTableVisitData}
+                  fetchVisits={silentRefreshAll}
                 />
               )}
             </div>
@@ -176,11 +190,11 @@ export default function PageClient({ user }: { user: any }) {
           {isLoading ? (
             <Skeleton className="w-full h-full" />
           ) : (
-            <div className="w-full h-full border rounded">
+            <div className="w-full h-full border rounded flex items-center justify-center">
               {internationalOrDomestic === "Domestic" ? (
-                  <UsaMap states={mapVisitData as StateVisit[]} /> // TODO: this map should only have a loading state when toggling between international and domestic travel
+                  <UsaMap states={mapVisitData as StateVisit[]} />
               ) : (
-                  <WorldMap countries={mapVisitData as CountryVisit[]} /> // TODO: this map should only have a loading state when toggling between international and domestic travel
+                  <WorldMap countries={mapVisitData as CountryVisit[]} />
               )}
             </div>
           )}
