@@ -148,8 +148,7 @@ export default function PageClient({ user }: { user: any }) {
           value={internationalOrDomestic}
           onValueChange={setInternationalOrDomestic} />
       </div>
-      <div className="flex flex-row gap-3 p-3 flex-1 overflow-hidden">
-
+      <div className="flex flex-row gap-3 pt-0 pb-3 px-3 flex-1 overflow-hidden">
         <div className="w-[33%] overflow-y-auto scrollbar-hidden">
           {isLoading ? (
             <Skeleton className="h-full w-full" />
