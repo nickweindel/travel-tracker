@@ -1,8 +1,3 @@
-// TODO: implement some more logic for loading
-// If switching between international and domestic, set everything to loading.
-// If switching between states and national parks, set table and KPIs to loading (not map).
-// If switching between countries and continents set KPIs to loading (not table or map).
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -28,7 +23,12 @@ export default function PageClient({ user }: { user: any }) {
   const [tableVisitData, setTableVisitData] = useState<StateVisit[] | CountryVisit[] | ParkVisit[]>([]);
   const [mapVisitData, setMapVisitData] = useState<StateVisit[] | CountryVisit[]>([]);
   const [kpiData, setKpiData] = useState<StateKpi | CountryKpi | ContinentKpi | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  
+
+  // Different loading states because we only rerender components for certain switches
+  const [isTableLoading, setIsTableLoading] = useState<boolean>(true);
+  const [isMapLoading, setIsMapLoading] = useState<boolean>(true);
+  const [isKpiLoading, setIsKpiLoading] = useState<boolean>(true);
 
   const fetchTableVisitData = async () => {
     const visitLocation =
@@ -65,37 +65,62 @@ export default function PageClient({ user }: { user: any }) {
     return data.kpis;
   };
   
-  // Refresh everything with a loading skeleton.
+  // ---- Map ----
+  // Only reload map when switching Domestic <-> International
   useEffect(() => {
     let cancelled = false;
-  
-    const run = async () => {
-      setIsLoading(true);
-  
+
+    const fetchMap = async () => {
+      setIsMapLoading(true);
       try {
-        const [table, map, kpi] = await Promise.all([
-          fetchTableVisitData(),
-          fetchMapVisitData(),
-          fetchVisitKpiData(),
-        ]);
-  
-        if (!cancelled) {
-          setTableVisitData(table);
-          setMapVisitData(map);
-          setKpiData(kpi);
-        }
+        const mapData = await fetchMapVisitData();
+        if (!cancelled) setMapVisitData(mapData);
       } finally {
-        if (!cancelled) setIsLoading(false);
+        if (!cancelled) setIsMapLoading(false);
       }
     };
-  
-    run();
-    return () => { cancelled = true; }
-  }, [
-    internationalOrDomestic,
-    stateOrPark,
-    countryOrContinent
-  ]);
+
+    fetchMap();
+    return () => { cancelled = true; };
+  }, [internationalOrDomestic]);
+
+  // ---- Table ----
+  // Reload table when switching Domestic <-> International OR State <-> Park
+  useEffect(() => {
+    let cancelled = false;
+
+    const fetchTable = async () => {
+      setIsTableLoading(true);
+      try {
+        const tableData = await fetchTableVisitData();
+        if (!cancelled) setTableVisitData(tableData);
+      } finally {
+        if (!cancelled) setIsTableLoading(false);
+      }
+    };
+
+    fetchTable();
+    return () => { cancelled = true; };
+  }, [internationalOrDomestic, stateOrPark]);
+
+  // ---- KPI ----
+  // Reload KPI on every switch
+  useEffect(() => {
+    let cancelled = false;
+
+    const fetchKpi = async () => {
+      setIsKpiLoading(true);
+      try {
+        const kpi = await fetchVisitKpiData();
+        if (!cancelled) setKpiData(kpi);
+      } finally {
+        if (!cancelled) setIsKpiLoading(false);
+      }
+    };
+
+    fetchKpi();
+    return () => { cancelled = true; };
+  }, [internationalOrDomestic, stateOrPark, countryOrContinent]);
 
   // Change the visit KPI dimension.
   useEffect(() => {
@@ -126,78 +151,114 @@ export default function PageClient({ user }: { user: any }) {
     setMapVisitData(map);
     setKpiData(kpi);
   };
-  
 
+  // Helper function to safely get KPI values
+  function getKpiValue(
+    kpi: StateKpi | CountryKpi | ContinentKpi | ParkKpi | null,
+    dimension: string,
+    type: "visited" | "not_visited"
+  ): number {
+    if (!kpi) return 0;
+    const key = `${dimension}_${type}` as keyof typeof kpi;
+    return kpi[key] as number;
+  }
+  
   return (
     <div className="flex flex-col h-screen">
+      {/* Page Header */}
       <PageHeader user={user} />
+
+      {/* Selectors */}
       <div className="flex flex-row gap-3 p-3 justify-end">
         {internationalOrDomestic === "International" ? (
-          <Selector 
+          <Selector
             category="countryOrContinent"
             value={countryOrContinent}
-            onValueChange={setCountryOrContinent} />
-        ) : 
+            onValueChange={setCountryOrContinent}
+          />
+        ) : (
           <Selector
             category="stateOrPark"
             value={stateOrPark}
-            onValueChange={setStateOrPark} />
-        }
-        <Selector 
+            onValueChange={setStateOrPark}
+          />
+        )}
+        <Selector
           category="internationalOrDomestic"
           value={internationalOrDomestic}
-          onValueChange={setInternationalOrDomestic} />
+          onValueChange={setInternationalOrDomestic}
+        />
       </div>
-      <div className="flex flex-row gap-3 pt-0 pb-3 px-3 flex-1 overflow-hidden">
-        <div className="w-[33%] overflow-y-auto scrollbar-hidden">
-          {isLoading ? (
-            <Skeleton className="h-full w-full" />
-          ) : (
-            <div className="flex flex-col gap-3">
-              <VisitKpi 
+
+      {/* Main Content */}
+      <div className="flex flex-1 gap-3 p-3 overflow-hidden">
+
+        {/* Left Panel */}
+        <div className="w-[33%] h-full flex flex-col gap-3">
+
+          {/* KPI */}
+          <div className="w-full">
+            {isKpiLoading ? (
+              <Skeleton className="w-full h-32" />
+            ) : (
+              <VisitKpi
                 visitKpiDimension={visitKpiDimension}
-                visitedValue={kpiData?.[`${visitKpiDimension}_visited` as keyof (StateKpi | CountryKpi | ContinentKpi | ParkKpi)]}
-                notVisitedValue={kpiData?.[`${visitKpiDimension}_not_visited` as keyof (StateKpi | CountryKpi | ContinentKpi | ParkKpi)]} />
-              {internationalOrDomestic === "Domestic" ? (
-                stateOrPark === "State" ? (
-                  <VisitTable
-                    location="states"
-                    data={tableVisitData as StateVisit[]}
-                    user={user}
-                    fetchVisits={silentRefreshAll}
-                  />
+                visitedValue={getKpiValue(kpiData, visitKpiDimension, "visited")}
+                notVisitedValue={getKpiValue(kpiData, visitKpiDimension, "not_visited")}
+              />
+            )}
+          </div>
+
+          {/* Table */}
+          <div className="flex-1 w-full min-h-0 overflow-y-auto scrollbar-hidden">
+            {isTableLoading ? (
+              <Skeleton className="h-full w-full" />
+            ) : (
+              <>
+                {internationalOrDomestic === "Domestic" ? (
+                  stateOrPark === "State" ? (
+                    <VisitTable
+                      location="states"
+                      data={tableVisitData as StateVisit[]}
+                      user={user}
+                      fetchVisits={silentRefreshAll}
+                    />
+                  ) : (
+                    <VisitTable
+                      location="national_parks"
+                      data={tableVisitData as ParkVisit[]}
+                      user={user}
+                      fetchVisits={silentRefreshAll}
+                    />
+                  )
                 ) : (
                   <VisitTable
-                    location="national_parks"
-                    data={tableVisitData as ParkVisit[]}
+                    location="countries"
+                    data={tableVisitData as CountryVisit[]}
                     user={user}
                     fetchVisits={silentRefreshAll}
                   />
-                )
-              ) : (
-                <VisitTable
-                  location="countries"
-                  data={tableVisitData as CountryVisit[]}
-                  user={user}
-                  fetchVisits={silentRefreshAll}
-                />
-              )}
-            </div>
-          )}
+                )}
+              </>
+            )}
+          </div>
         </div>
+
+        {/* Right Panel: Map */}
         <div className="w-[67%] h-full">
-          {isLoading ? (
+          {isMapLoading ? (
             <Skeleton className="w-full h-full" />
           ) : (
             <div className="w-full h-full border rounded flex items-center justify-center">
               {internationalOrDomestic === "Domestic" ? (
-                  <UsaMap states={mapVisitData as StateVisit[]} />
+                <UsaMap states={mapVisitData as StateVisit[]} />
               ) : (
-                  <WorldMap countries={mapVisitData as CountryVisit[]} />
+                <WorldMap countries={mapVisitData as CountryVisit[]} />
               )}
             </div>
           )}
         </div>
+
       </div>
     </div>
   );
