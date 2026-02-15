@@ -4,6 +4,7 @@ export interface CountryVisit {
   country_name: string;
   continent: string;
   visited: boolean;
+  only_airport: boolean;
 }
 
 export interface CountryKpi {
