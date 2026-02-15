@@ -16,14 +16,22 @@ import { StateVisit, StateKpi } from "@/types/states";
 import { ParkVisit, ParkKpi } from "@/types/parks";
 
 export default function PageClient({ user }: { user: any }) {
-  const [internationalOrDomestic, setInternationalOrDomestic] = useState("Domestic");
+  const [internationalOrDomestic, setInternationalOrDomestic] =
+    useState("Domestic");
   const [countryOrContinent, setCountryOrContinent] = useState("Country");
   const [stateOrPark, setStateOrPark] = useState("State");
-  const [visitKpiDimension, setVisitKpiDimension] = useState<"states" | "countries" | "continents" | "national_parks">("states");
-  const [tableVisitData, setTableVisitData] = useState<StateVisit[] | CountryVisit[] | ParkVisit[]>([]);
-  const [mapVisitData, setMapVisitData] = useState<StateVisit[] | CountryVisit[]>([]);
-  const [kpiData, setKpiData] = useState<StateKpi | CountryKpi | ContinentKpi | null>(null);
-  
+  const [visitKpiDimension, setVisitKpiDimension] = useState<
+    "states" | "countries" | "continents" | "national_parks"
+  >("states");
+  const [tableVisitData, setTableVisitData] = useState<
+    StateVisit[] | CountryVisit[] | ParkVisit[]
+  >([]);
+  const [mapVisitData, setMapVisitData] = useState<
+    StateVisit[] | CountryVisit[]
+  >([]);
+  const [kpiData, setKpiData] = useState<
+    StateKpi | CountryKpi | ContinentKpi | null
+  >(null);
 
   // Different loading states because we only rerender components for certain switches
   const [isTableLoading, setIsTableLoading] = useState<boolean>(true);
@@ -33,23 +41,25 @@ export default function PageClient({ user }: { user: any }) {
   const fetchTableVisitData = async () => {
     const visitLocation =
       internationalOrDomestic === "Domestic"
-        ? stateOrPark === "State" ? "states" : "national_parks"
+        ? stateOrPark === "State"
+          ? "states"
+          : "national_parks"
         : "countries";
-  
+
     const response = await fetch(`api/${visitLocation}?user=${user}`);
     const data = await response.json();
     return data.visits;
   };
-  
+
   const fetchMapVisitData = async () => {
     const visitLocation =
       internationalOrDomestic === "Domestic" ? "states" : "countries";
-  
+
     const response = await fetch(`api/${visitLocation}?user=${user}`);
     const data = await response.json();
     return data.visits;
   };
-  
+
   const fetchVisitKpiData = async () => {
     const dimension =
       internationalOrDomestic === "Domestic"
@@ -57,14 +67,14 @@ export default function PageClient({ user }: { user: any }) {
           ? "states"
           : "national_parks"
         : countryOrContinent === "Country"
-        ? "countries"
-        : "continents";
-  
+          ? "countries"
+          : "continents";
+
     const response = await fetch(`api/${dimension}/kpi?user=${user}`);
     const data = await response.json();
     return data.kpis;
   };
-  
+
   // ---- Map ----
   // Only reload map when switching Domestic <-> International
   useEffect(() => {
@@ -81,7 +91,9 @@ export default function PageClient({ user }: { user: any }) {
     };
 
     fetchMap();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [internationalOrDomestic]);
 
   // ---- Table ----
@@ -100,7 +112,9 @@ export default function PageClient({ user }: { user: any }) {
     };
 
     fetchTable();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [internationalOrDomestic, stateOrPark]);
 
   // ---- KPI ----
@@ -119,7 +133,9 @@ export default function PageClient({ user }: { user: any }) {
     };
 
     fetchKpi();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [internationalOrDomestic, stateOrPark, countryOrContinent]);
 
   // Change the visit KPI dimension.
@@ -139,14 +155,14 @@ export default function PageClient({ user }: { user: any }) {
     }
   }, [internationalOrDomestic, stateOrPark, countryOrContinent]);
 
-  // Refresh everything but do not show a loading skeleton. 
+  // Refresh everything but do not show a loading skeleton.
   const silentRefreshAll = async () => {
     const [table, map, kpi] = await Promise.all([
       fetchTableVisitData(),
       fetchMapVisitData(),
       fetchVisitKpiData(),
     ]);
-  
+
     setTableVisitData(table);
     setMapVisitData(map);
     setKpiData(kpi);
@@ -156,13 +172,13 @@ export default function PageClient({ user }: { user: any }) {
   function getKpiValue(
     kpi: StateKpi | CountryKpi | ContinentKpi | ParkKpi | null,
     dimension: string,
-    type: "visited" | "not_visited"
+    type: "visited" | "not_visited",
   ): number {
     if (!kpi) return 0;
     const key = `${dimension}_${type}` as keyof typeof kpi;
     return kpi[key] as number;
   }
-  
+
   return (
     <div className="flex flex-col h-screen">
       {/* Page Header */}
@@ -192,10 +208,8 @@ export default function PageClient({ user }: { user: any }) {
 
       {/* Main Content */}
       <div className="flex flex-1 gap-3 p-3 overflow-hidden">
-
         {/* Left Panel */}
         <div className="w-[33%] h-full flex flex-col gap-3">
-
           {/* KPI */}
           <div className="w-full">
             {isKpiLoading ? (
@@ -203,8 +217,16 @@ export default function PageClient({ user }: { user: any }) {
             ) : (
               <VisitKpi
                 visitKpiDimension={visitKpiDimension}
-                visitedValue={getKpiValue(kpiData, visitKpiDimension, "visited")}
-                notVisitedValue={getKpiValue(kpiData, visitKpiDimension, "not_visited")}
+                visitedValue={getKpiValue(
+                  kpiData,
+                  visitKpiDimension,
+                  "visited",
+                )}
+                notVisitedValue={getKpiValue(
+                  kpiData,
+                  visitKpiDimension,
+                  "not_visited",
+                )}
               />
             )}
           </div>
@@ -258,7 +280,6 @@ export default function PageClient({ user }: { user: any }) {
             </div>
           )}
         </div>
-
       </div>
     </div>
   );
