@@ -5,9 +5,12 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 
-type SelectorCategory = "internationalOrDomestic" | "countryOrContinent" | "stateOrPark";
+type SelectorCategory =
+  | "internationalOrDomestic"
+  | "countryOrContinent"
+  | "stateOrPark";
 
 interface SelectorProps {
   category: SelectorCategory;
@@ -17,46 +20,45 @@ interface SelectorProps {
 
 export function Selector({ value, category, onValueChange }: SelectorProps) {
   const selectOptions = {
-    "internationalOrDomestic": {
-      "defaultValue": "Domestic",
-      "options": {
-        "domestic": "Domestic",
-        "international": "International",
+    internationalOrDomestic: {
+      defaultValue: "Domestic",
+      options: {
+        domestic: "Domestic",
+        international: "International",
       },
     },
-    "countryOrContinent": {
-      "defaultValue": "Country",
-      "options": {
-        "country": "Country",
-        "continent": "Continent",
+    countryOrContinent: {
+      defaultValue: "Country",
+      options: {
+        country: "Country",
+        continent: "Continent",
       },
     },
-    "stateOrPark": {
-      "defaultValue": "State",
-      "options": {
-        "state": "State",
-        "national_park": "National Park",
+    stateOrPark: {
+      defaultValue: "State",
+      options: {
+        state: "State",
+        national_park: "National Park",
       },
     },
-  }
+  };
 
   return (
-    <Select
-      value={value}
-      onValueChange={onValueChange}
-    >
+    <Select value={value} onValueChange={onValueChange}>
       <SelectTrigger className="w-[180px]">
         <SelectValue />
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
-          {Object.entries(selectOptions[category].options).map(([value, label]) => (
-            <SelectItem key={value} value={label}>
-              {label}
-            </SelectItem>
-          ))}
+          {Object.entries(selectOptions[category].options).map(
+            ([value, label]) => (
+              <SelectItem key={value} value={label}>
+                {label}
+              </SelectItem>
+            ),
+          )}
         </SelectGroup>
       </SelectContent>
     </Select>
-  )
+  );
 }

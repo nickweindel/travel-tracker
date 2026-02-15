@@ -19,12 +19,12 @@ interface UsaMapProps {
 const UsaMap: React.FC<UsaMapProps> = ({ states }) => {
   const statesFilling = () => {
     const visitedStates: { [key: string]: { fill: string } } = {};
-    console.log(visitedStates)
+    console.log(visitedStates);
 
-    states.forEach(state => {
+    states.forEach((state) => {
       if (state.visited) {
         visitedStates[state.state_id] = {
-          fill: MAP_FILL
+          fill: MAP_FILL,
         };
       }
     });
