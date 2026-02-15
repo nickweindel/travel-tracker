@@ -6,7 +6,10 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "migrate": "ts-node src/app/api/migrations.ts"
+    "migrate": "ts-node src/app/api/migrations.ts",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write 'src/**/*.{ts,tsx,js,jsx,css,md}'"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -28,11 +31,13 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
+    "eslint": "^10.0.0",
     "lucide-react": "^0.544.0",
     "next": "15.5.7",
     "next-themes": "^0.4.6",
     "numeral": "^2.0.6",
     "pg": "^8.16.3",
+    "prettier": "^3.8.1",
     "radix-ui": "^1.4.3",
     "react": "19.1.2",
     "react-day-picker": "^9.10.0",
