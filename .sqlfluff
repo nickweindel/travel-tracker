@@ -4,8 +4,10 @@ templeter = raw
 max_line_length = 80
 large_file_skip_byte_limit = 0
 
-# Ignore LT05 (max line length) and Lt12 (ending files with trailing newline)
-exclude_rules = LT12, LT05
+# Ignore LT05 (max line length), 
+# LT12 (ending files with trailing newline), 
+# and ST06 (column order)
+exclude_rules = LT12, LT05, ST06
 
 # Global rule defaults
 [sqlfluff:rules]

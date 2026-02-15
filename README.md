@@ -26,6 +26,7 @@ create table public.countries_visited (
   user_id character varying(100) not null,
   country_id character varying(2) not null,
   visited boolean not null default false,
+  only_airport boolean not null default false,
   constraint countries_visited_pkey primary key (user_id, country_id)
 ) TABLESPACE pg_default;
 
@@ -33,12 +34,14 @@ create table public.states_visited (
   user_id character varying(100) not null,
   state_id character varying(3) not null,
   visited boolean not null default false,
+  only_airport boolean not null default false,
   constraint states_visited_pkey primary key (user_id, state_id)
 ) TABLESPACE pg_default;
 
 create table public.us_states (
   state_id character varying(3) not null,
   state_name character varying(16) not null,
+  state_kpi_exception boolean not null,
   constraint us_states_pkey primary key (state_id)
 ) TABLESPACE pg_default;
 
@@ -160,7 +163,7 @@ pnpm run lint:fix
 3. Format files with Prettier:
 
 ```bash
-pnpm run format"
+pnpm run format
 ```
 
 ### SQL
