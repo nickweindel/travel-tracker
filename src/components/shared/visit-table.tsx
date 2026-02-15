@@ -5,6 +5,14 @@ import { ParkVisit } from "@/types/parks";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+
+import { Info } from "lucide-react";
 
 type TravelTableBase = {
   user: string;
@@ -91,7 +99,26 @@ export function VisitTable({
               data.map((state) => (
                 <TableRow key={(state as StateVisit).state_id}>
                   <TableCell className="font-medium w-[75%]">
-                    {(state as StateVisit).state_name}
+                    <div className="flex items-center gap-2">
+                      {state.state_name}
+
+                      {state.state_kpi_exception && (
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Info className="h-4 w-4 text-muted-foreground cursor-pointer" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>
+                                {state.state_name} is not a state. Clicking that
+                                you've visited will fill in the map but not
+                                affect your Visit Stats.
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell className="w-[25%]">
                     <Checkbox

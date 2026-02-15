@@ -39,6 +39,7 @@ create table public.states_visited (
 create table public.us_states (
   state_id character varying(3) not null,
   state_name character varying(16) not null,
+  state_kpi_exception boolean not null,
   constraint us_states_pkey primary key (state_id)
 ) TABLESPACE pg_default;
 
@@ -160,7 +161,7 @@ pnpm run lint:fix
 3. Format files with Prettier:
 
 ```bash
-pnpm run format"
+pnpm run format
 ```
 
 ### SQL
