@@ -42,26 +42,45 @@ export async function PUT(request: NextRequest) {
     const [, , location] = pathname.split("/");
 
     const tableName = `${location}_visited`;
+
     const columnPrefix =
       location === "states"
         ? "state"
         : location === "national_parks"
           ? "park"
           : "country";
+
     const idField = `${columnPrefix}_id`;
 
-    const { id, user_id, visited } = await request.json();
+    const { id, user_id, visited, only_airport } = await request.json();
 
-    const { error } = await supabase.from(tableName).upsert(
-      {
-        [idField]: id,
-        user_id,
-        visited,
-      },
-      {
-        onConflict: `${idField},user_id`,
-      },
-    );
+    // Build update object dynamically
+    const updateData: any = {
+      [idField]: id,
+      user_id,
+    };
+
+    if (typeof visited === "boolean") {
+      updateData.visited = visited;
+
+      // If visited is true → clear only_airport automatically
+      if (visited === true) {
+        updateData.only_airport = false;
+      }
+    }
+
+    // Only allow only_airport for states & countries
+    if (
+      (location === "states" || location === "countries") &&
+      typeof only_airport === "boolean" &&
+      visited !== true // prevent override if visited just became true
+    ) {
+      updateData.only_airport = only_airport;
+    }
+
+    const { error } = await supabase.from(tableName).upsert(updateData, {
+      onConflict: `${idField},user_id`,
+    });
 
     if (error) {
       console.error("Supabase upsert error:", error);

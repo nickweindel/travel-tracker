@@ -4,6 +4,7 @@ export interface StateVisit {
   state_name: string;
   visited: boolean;
   state_kpi_exception: boolean;
+  only_airport: boolean;
 }
 
 export interface StateKpi {
