@@ -6,7 +6,7 @@ This folder contains SQL migration files for the project’s Supabase database. 
 
 ## Initial Migration
 
-The first migration file `20260206224440_remote_schema.sql` sets up the initial database schema.
+The first migration file `20260214153533_remote_schema.sql` sets up the initial database schema.
 
 ### Pulling in the Initial Schema from an Existing Project
 
