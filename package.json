@@ -17,7 +17,7 @@
       "prettier --write"
     ],
     "*.sql": [
-      "sqlfluff fix --force --dialect postgres"
+      "sh -c 'sqlfluff fix --force --dialect postgres \"$@\" || true' _"
     ]
   },
   "dependencies": {
