@@ -83,14 +83,14 @@ create table public.us_national_parks (
 |   |   ├── supabase                  # Supabase client, server, and middleware utilities
 │   │   ├── constants.ts
 │   │   └── utils.ts
-│   └── types/  
+│   └── types/
 ├── supabase/
 │   ├── migrations/
 │   │   ├── README.md
 │   │   └── 20260214153533_remote_schema.sql # Baseline checkin of supabase schema
 ├── package.json
 ├── pnpm-lock.yaml
-└── README.md                    
+└── README.md
 ```
 
 ## Local Development
@@ -103,17 +103,20 @@ create table public.us_national_parks (
 ### Setup
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/your-username/project-name.git
    cd project-name
    ```
 
 2. **Install dependencies**
+
    ```bash
    pnpm install
    ```
 
 3. **Run the development server**
+
    ```bash
    pnpm dev
    ```
@@ -125,11 +128,11 @@ create table public.us_national_parks (
 
 ## API Routes
 
-| Route                       | Method | Description                                                                      |
-|-----------------------------|--------|----------------------------------------------------------------------------------|                        
-| `/api/[location]`           | GET    | Fetch visit data for states and countries                                        |
-| `/api/[location]`           | PUT    | Add or update if a state or country has been visited                             |
-| `/api/[location]/kpi`       | GET    | Fetch breakdown of number of states/countries/continents visited or not visited  |
+| Route                 | Method | Description                                                                     |
+| --------------------- | ------ | ------------------------------------------------------------------------------- |
+| `/api/[location]`     | GET    | Fetch visit data for states and countries                                       |
+| `/api/[location]`     | PUT    | Add or update if a state or country has been visited                            |
+| `/api/[location]/kpi` | GET    | Fetch breakdown of number of states/countries/continents visited or not visited |
 
 ---
 
@@ -142,7 +145,7 @@ create table public.us_national_parks (
 
 ## Linting
 
-Currently, there are no pre-commit hooks for linting in this repository. Instead, follow the below instructions to clean files before committing.
+This repository uses _Husky_ and _lint-staged_ to automatically format code before committing to the remote branch.
 
 ### TypeScript
 
@@ -168,7 +171,7 @@ pnpm run format
 
 ### SQL
 
-This repository uses [SQLFluff](https://www.sqlfluff.com/) for linting `.sql` files. 
+This repository uses [SQLFluff](https://www.sqlfluff.com/) for linting `.sql` files.
 
 First, make sure that sqlfluff is installed:
 
