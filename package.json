@@ -15,10 +15,6 @@
   "lint-staged": {
     "*.{js,jsx,ts,tsx,css,md}": [
       "prettier --write"
-    ],
-    "*.sql": [
-      "sqlfluff fix",
-      "sqlfluff lint"
     ]
   },
   "dependencies": {
