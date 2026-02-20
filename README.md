@@ -145,7 +145,7 @@ create table public.us_national_parks (
 
 ## Linting
 
-This repository uses _Husky_ and _lint-staged_ to automatically format code before committing to the remote branch.
+This repository uses **Husky** and **lint-staged** to automatically format code before committing to the remote branch.
 
 ### TypeScript
 
