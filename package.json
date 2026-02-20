@@ -17,7 +17,8 @@
       "prettier --write"
     ],
     "*.sql": [
-      "sqlfluff fix"
+      "sqlfluff fix",
+      "sqlfluff lint"
     ]
   },
   "dependencies": {
