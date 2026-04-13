@@ -4,7 +4,6 @@ import { ParkVisit } from "@/types/parks";
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Tooltip,
   TooltipContent,
@@ -82,9 +81,9 @@ export function VisitTable({
   }
 
   return (
-    <div className="border rounded h-full flex flex-col overflow-x-auto">
-      <ScrollArea className="flex-1 min-h-0">
-        <Table className="w-full min-w-[560px] md:min-w-0">
+    <div className="border rounded h-full flex flex-col">
+      <div className="flex-1 min-h-0 overflow-auto">
+        <Table className="w-full min-w-[560px]">
           <TableBody>
             {location === "countries" &&
               data.map((country) => (
@@ -275,7 +274,7 @@ export function VisitTable({
               ))}
           </TableBody>
         </Table>
-      </ScrollArea>
+      </div>
     </div>
   );
 }

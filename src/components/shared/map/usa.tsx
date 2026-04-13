@@ -20,7 +20,6 @@ interface UsaMapProps {
 const UsaMap: React.FC<UsaMapProps> = ({ states }) => {
   const statesFilling = () => {
     const visitedStates: { [key: string]: { fill: string } } = {};
-    console.log(visitedStates);
 
     states.forEach((state) => {
       if (state.visited) {
