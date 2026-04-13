@@ -82,9 +82,9 @@ export function VisitTable({
   }
 
   return (
-    <div className="border rounded h-full flex flex-col">
+    <div className="border rounded h-full flex flex-col overflow-x-auto">
       <ScrollArea className="flex-1 min-h-0">
-        <Table className="w-full">
+        <Table className="w-full min-w-[560px] md:min-w-0">
           <TableBody>
             {location === "countries" &&
               data.map((country) => (

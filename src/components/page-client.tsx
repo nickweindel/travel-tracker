@@ -180,12 +180,12 @@ export default function PageClient({ user }: { user: any }) {
   }
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex min-h-screen flex-col md:h-screen">
       {/* Page Header */}
       <PageHeader user={user} />
 
       {/* Selectors */}
-      <div className="flex flex-row gap-3 p-3 justify-end">
+      <div className="flex flex-row justify-end gap-3 p-3">
         {internationalOrDomestic === "International" ? (
           <Selector
             category="countryOrContinent"
@@ -207,11 +207,11 @@ export default function PageClient({ user }: { user: any }) {
       </div>
 
       {/* Main Content */}
-      <div className="flex flex-1 gap-3 p-3 overflow-hidden">
+      <div className="flex flex-1 flex-col gap-3 px-3 pb-3 pt-0 md:min-h-0 md:flex-row md:overflow-hidden">
         {/* Left Panel */}
-        <div className="w-[33%] h-full flex flex-col gap-3">
+        <div className="flex w-full flex-col gap-3 md:h-full md:w-[33%] md:min-h-0">
           {/* KPI */}
-          <div className="w-full">
+          <div className="w-full flex-none">
             {isKpiLoading ? (
               <Skeleton className="w-full h-32" />
             ) : (
@@ -232,9 +232,9 @@ export default function PageClient({ user }: { user: any }) {
           </div>
 
           {/* Table */}
-          <div className="flex-1 w-full min-h-0 overflow-y-auto scrollbar-hidden">
+          <div className="w-full md:flex-1 md:min-h-0 md:overflow-y-auto scrollbar-hidden">
             {isTableLoading ? (
-              <Skeleton className="h-full w-full" />
+              <Skeleton className="h-80 w-full md:h-full" />
             ) : (
               <>
                 {internationalOrDomestic === "Domestic" ? (
@@ -267,11 +267,11 @@ export default function PageClient({ user }: { user: any }) {
         </div>
 
         {/* Right Panel: Map */}
-        <div className="w-[67%] h-full">
+        <div className="w-full min-h-[320px] md:h-full md:w-[67%] md:min-h-0">
           {isMapLoading ? (
             <Skeleton className="w-full h-full" />
           ) : (
-            <div className="w-full h-full border rounded flex items-center justify-center">
+            <div className="w-full h-full min-h-[320px] border rounded flex items-center justify-center md:min-h-0">
               {internationalOrDomestic === "Domestic" ? (
                 <UsaMap states={mapVisitData as StateVisit[]} />
               ) : (

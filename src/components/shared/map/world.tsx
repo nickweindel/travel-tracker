@@ -81,7 +81,11 @@ export default function WorldMap({ countries }: WorldMapProps) {
   }, [countries]);
 
   return (
-    <ComposableMap projectionConfig={{ scale: 140 }}>
+    <ComposableMap
+      className="h-full w-full"
+      style={{ width: "100%", height: "100%" }}
+      projectionConfig={{ scale: 140 }}
+    >
       <Geographies geography={geoUrl}>
         {({ geographies }: { geographies: any[] }) =>
           geographies.map((geo: any) => {
