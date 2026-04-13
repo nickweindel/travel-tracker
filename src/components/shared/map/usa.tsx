@@ -38,7 +38,7 @@ const UsaMap: React.FC<UsaMapProps> = ({ states }) => {
   };
 
   return (
-    <div>
+    <div className="flex h-full w-full items-center justify-center overflow-hidden [&_svg]:h-auto [&_svg]:max-h-full [&_svg]:max-w-full">
       <USAMap customize={statesFilling()} />
     </div>
   );
