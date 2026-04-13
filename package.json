@@ -38,6 +38,7 @@
     "numeral": "^2.0.6",
     "pg": "^8.16.3",
     "prettier": "^3.8.1",
+    "prop-types": "^15.8.1",
     "radix-ui": "^1.4.3",
     "react": "19.1.2",
     "react-day-picker": "^9.10.0",
