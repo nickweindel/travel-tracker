@@ -38,14 +38,8 @@ export default function WorldMap({ countries }: WorldMapProps) {
       if (!visitedCodes && !airportCodes) return;
 
       try {
-        const res = await fetch(
-          `https://restcountries.com/v3.1/alpha?codes=${[
-            visitedCodes,
-            airportCodes,
-          ]
-            .filter(Boolean)
-            .join(",")}`,
-        );
+        const codes = [visitedCodes, airportCodes].filter(Boolean).join(",");
+        const res = await fetch(`/api/countries/alpha?codes=${codes}`);
         const data = await res.json();
 
         const visitedSet = new Set<string>(
@@ -89,7 +83,7 @@ export default function WorldMap({ countries }: WorldMapProps) {
       <Geographies geography={geoUrl}>
         {({ geographies }: { geographies: any[] }) =>
           geographies.map((geo: any) => {
-            const countryId = geo.id; // numeric id (e.g., 840 for USA)
+            const countryId = String(geo.id); // numeric id (e.g., 840 for USA)
             let fillColor = "#E0E0E0";
 
             if (visitedCcn3.has(countryId)) fillColor = MAP_VISITED_FILL;
