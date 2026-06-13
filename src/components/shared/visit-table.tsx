@@ -57,12 +57,11 @@ export function VisitTable({
       const res = await fetch(`/api/${location}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id,
-          user_id: userId,
-          visited,
-          only_airport,
-        }),
+        body: JSON.stringify(
+          location === "national_parks"
+            ? { id, user_id: userId, visited }
+            : { id, user_id: userId, visited, only_airport },
+        ),
       });
       if (!res.ok) throw new Error("Failed to update visit status");
       fetchVisits();

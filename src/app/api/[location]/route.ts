@@ -52,7 +52,12 @@ export async function PUT(request: NextRequest) {
 
     const idField = `${columnPrefix}_id`;
 
-    const { id, user_id, visited, only_airport } = await request.json();
+    const body = await request.json();
+    const { id, user_id, visited } = body;
+    const only_airport =
+      location === "states" || location === "countries"
+        ? body.only_airport
+        : undefined;
 
     // Build update object dynamically
     const updateData: any = {
@@ -64,7 +69,10 @@ export async function PUT(request: NextRequest) {
       updateData.visited = visited;
 
       // If visited is true → clear only_airport automatically
-      if (visited === true) {
+      if (
+        visited === true &&
+        (location === "states" || location === "countries")
+      ) {
         updateData.only_airport = false;
       }
     }
