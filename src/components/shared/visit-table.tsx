@@ -11,7 +11,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-import { Info, Plane } from "lucide-react";
+import { Info, Plane, Camera } from "lucide-react";
 
 type TravelTableBase = {
   user: string;
@@ -119,7 +119,7 @@ export function VisitTable({
                   </TableCell>
 
                   {/* Airport Only */}
-                  <TableCell className="w-[25%]">
+                  <TableCell className="w-[20%]">
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
@@ -157,6 +157,11 @@ export function VisitTable({
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
+                  </TableCell>
+
+                  {/* Photo */}
+                  <TableCell className="w-[5%]">
+                    <Camera className="h-5 w-5 text-muted-foreground hover:text-primary" />
                   </TableCell>
                 </TableRow>
               ))}
@@ -209,7 +214,7 @@ export function VisitTable({
                   </TableCell>
 
                   {/* Airport Only */}
-                  <TableCell className="w-[25%]">
+                  <TableCell className="w-[20%]">
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
@@ -248,6 +253,11 @@ export function VisitTable({
                       </Tooltip>
                     </TooltipProvider>
                   </TableCell>
+
+                  {/* Photo */}
+                  <TableCell className="w-[5%]">
+                    <Camera className="h-5 w-5 text-muted-foreground hover:text-primary" />
+                  </TableCell>
                 </TableRow>
               ))}
             {location === "national_parks" &&
@@ -256,7 +266,7 @@ export function VisitTable({
                   <TableCell className="font-medium w-[75%]">
                     {(park as ParkVisit).park_name}
                   </TableCell>
-                  <TableCell className="w-[25%]">
+                  <TableCell className="w-[20%]">
                     <Checkbox
                       checked={(park as ParkVisit).visited}
                       onCheckedChange={async (checked) => {
@@ -268,6 +278,9 @@ export function VisitTable({
                         });
                       }}
                     />
+                  </TableCell>
+                  <TableCell className="w-[5%]">
+                    <Camera className="h-5 w-5 text-muted-foreground hover:text-primary" />
                   </TableCell>
                 </TableRow>
               ))}
