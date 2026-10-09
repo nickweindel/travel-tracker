@@ -30,7 +30,7 @@ const PHOTO_TABLES = {
     idColumn: "country_id",
   },
   park: {
-    table: "park_photos",
+    table: "national_park_photos",
     idColumn: "park_id",
   },
   state: {
