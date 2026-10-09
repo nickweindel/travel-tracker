@@ -1,3 +1,8 @@
+import { useState } from "react";
+
+import { PhotosDialog } from "@/components/shared/photos-dialog";
+import type { PhotoEntityType } from "@/lib/photos";
+
 import { StateVisit } from "@/types/states";
 import { CountryVisit } from "@/types/countries";
 import { ParkVisit } from "@/types/parks";
@@ -40,6 +45,12 @@ export function VisitTable({
   user,
   fetchVisits,
 }: TravelTableProps) {
+  const [selectedPhotoEntity, setSelectedPhotoEntity] = useState<{
+    id: string;
+    type: PhotoEntityType;
+    name: string;
+  } | null>(null);
+  
   async function updateVisitStatus({
     location,
     id,
@@ -161,7 +172,20 @@ export function VisitTable({
 
                   {/* Photo */}
                   <TableCell className="w-[5%]">
-                    <Camera className="h-5 w-5 text-muted-foreground hover:text-primary" />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setSelectedPhotoEntity({
+                          id: country.country_id,
+                          type: "country",
+                          name: country.country_name,
+                        })
+                      }
+                      aria-label={`View photos of ${country.country_name}`}
+                      className="cursor-pointer"
+                    >
+                      <Camera className="h-5 w-5 text-muted-foreground hover:text-primary" />
+                    </button>
                   </TableCell>
                 </TableRow>
               ))}
@@ -256,7 +280,20 @@ export function VisitTable({
 
                   {/* Photo */}
                   <TableCell className="w-[5%]">
-                    <Camera className="h-5 w-5 text-muted-foreground hover:text-primary" />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setSelectedPhotoEntity({
+                          id: state.state_id,
+                          type: "state",
+                          name: state.state_name,
+                        })
+                      }
+                      aria-label={`View photos of ${state.state_name}`}
+                      className="cursor-pointer"
+                    >
+                      <Camera className="h-5 w-5 text-muted-foreground hover:text-primary" />
+                    </button>
                   </TableCell>
                 </TableRow>
               ))}
@@ -280,12 +317,37 @@ export function VisitTable({
                     />
                   </TableCell>
                   <TableCell className="w-[5%]">
-                    <Camera className="h-5 w-5 text-muted-foreground hover:text-primary" />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setSelectedPhotoEntity({
+                          id: park.park_id,
+                          type: "park",
+                          name: park.park_name,
+                        })
+                      }
+                      aria-label={`View photos of ${park.park_name}`}
+                      className="cursor-pointer"
+                    >
+                      <Camera className="h-5 w-5 text-muted-foreground hover:text-primary" />
+                    </button>
                   </TableCell>
                 </TableRow>
               ))}
           </TableBody>
         </Table>
+
+        {selectedPhotoEntity && (
+          <PhotosDialog
+            user_id={user}
+            entity_type={selectedPhotoEntity.type}
+            entity_id={selectedPhotoEntity.id}
+            title={selectedPhotoEntity.name}
+            open={true}
+            onClose={() => setSelectedPhotoEntity(null)}
+            onPhotosUploaded={fetchVisits}
+          />
+        )}
       </div>
     </div>
   );
