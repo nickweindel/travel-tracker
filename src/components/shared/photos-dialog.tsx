@@ -63,7 +63,7 @@ export function PhotosDialog({
     fetchPhotos({
       user_id,
       entity_type,
-      entity_id,
+      entity_id: Number(entity_id),
     })
       .then((result) => {
         if (!cancelled) {
@@ -116,7 +116,7 @@ export function PhotosDialog({
         const updatedPhotos = await fetchPhotos({
           user_id,
           entity_type,
-          entity_id,
+          entity_id: Number(entity_id),
         });
 
         setPhotos(updatedPhotos);
