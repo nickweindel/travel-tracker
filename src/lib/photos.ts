@@ -45,7 +45,7 @@ const PHOTO_TABLES = {
 export async function fetchPhotos(params: {
   user_id: string;
   entity_type?: PhotoEntityType;
-  entity_id?: number;
+  entity_id?: string;
 }): Promise<Photo[]> {
   const url = new URL("/api/photos", window.location.origin);
 
