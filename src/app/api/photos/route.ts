@@ -49,13 +49,6 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    if (entity_type && !isPhotoEntityType(entity_type)) {
-      return NextResponse.json(
-        { error: "Invalid entity_type. Expected country, park, or state." },
-        { status: 400 },
-      );
-    }
-
     if (entity_id !== null && !entity_type) {
       return NextResponse.json(
         { error: "entity_type is required when entity_id is provided" },
@@ -65,9 +58,18 @@ export async function GET(req: NextRequest) {
 
     // Fetch from one table when a type is supplied;
     // otherwise fetch from all three tables.
-    const entityTypes: PhotoEntityType[] = entity_type
-      ? [entity_type]
-      : ["country", "park", "state"];
+    let entityTypes: PhotoEntityType[];
+    if (entity_type) {
+      if (!isPhotoEntityType(entity_type)) {
+        return NextResponse.json(
+          { error: "Invalid entity_type. Expected country, park, or state." },
+          { status: 400 },
+        );
+      }
+      entityTypes = [entity_type];
+    } else {
+      entityTypes = ["country", "park", "state"];
+    }
 
     const results = await Promise.all(
       entityTypes.map(async (type) => {
