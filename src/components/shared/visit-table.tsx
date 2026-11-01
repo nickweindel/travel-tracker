@@ -174,17 +174,30 @@ export function VisitTable({
                   <TableCell className="w-[5%]">
                     <button
                       type="button"
-                      onClick={() =>
+                      disabled={!country.visited}
+                      onClick={() => {
+                        if (!country.visited) return;
+
                         setSelectedPhotoEntity({
                           id: country.country_id,
                           type: "country",
                           name: country.country_name,
-                        })
-                      }
+                        });
+                      }}
                       aria-label={`View photos of ${country.country_name}`}
-                      className="cursor-pointer"
+                      className={`transition ${
+                        country.visited
+                          ? "cursor-pointer"
+                          : "opacity-40 cursor-not-allowed"
+                      }`}
                     >
-                      <Camera className="h-5 w-5 text-muted-foreground hover:text-primary" />
+                      <Camera
+                        className={`h-5 w-5 ${
+                          country.visited
+                            ? "text-muted-foreground hover:text-primary"
+                            : "text-muted-foreground"
+                        }`}
+                      />
                     </button>
                   </TableCell>
                 </TableRow>
@@ -282,17 +295,30 @@ export function VisitTable({
                   <TableCell className="w-[5%]">
                     <button
                       type="button"
-                      onClick={() =>
+                      disabled={!state.visited}
+                      onClick={() => {
+                        if (!state.visited) return;
+
                         setSelectedPhotoEntity({
                           id: state.state_id,
                           type: "state",
                           name: state.state_name,
-                        })
-                      }
+                        });
+                      }}
                       aria-label={`View photos of ${state.state_name}`}
-                      className="cursor-pointer"
+                      className={`transition ${
+                        state.visited
+                          ? "cursor-pointer"
+                          : "opacity-40 cursor-not-allowed"
+                      }`}
                     >
-                      <Camera className="h-5 w-5 text-muted-foreground hover:text-primary" />
+                      <Camera
+                        className={`h-5 w-5 ${
+                          state.visited
+                            ? "text-muted-foreground hover:text-primary"
+                            : "text-muted-foreground"
+                        }`}
+                      />
                     </button>
                   </TableCell>
                 </TableRow>
@@ -319,17 +345,30 @@ export function VisitTable({
                   <TableCell className="w-[5%]">
                     <button
                       type="button"
-                      onClick={() =>
+                      disabled={!park.visited}
+                      onClick={() => {
+                        if (!park.visited) return;
+
                         setSelectedPhotoEntity({
                           id: park.park_id,
                           type: "park",
                           name: park.park_name,
-                        })
-                      }
+                        });
+                      }}
                       aria-label={`View photos of ${park.park_name}`}
-                      className="cursor-pointer"
+                      className={`transition ${
+                        park.visited
+                          ? "cursor-pointer"
+                          : "opacity-40 cursor-not-allowed"
+                      }`}
                     >
-                      <Camera className="h-5 w-5 text-muted-foreground hover:text-primary" />
+                      <Camera
+                        className={`h-5 w-5 ${
+                          park.visited
+                            ? "text-muted-foreground hover:text-primary"
+                            : "text-muted-foreground"
+                        }`}
+                      />
                     </button>
                   </TableCell>
                 </TableRow>
