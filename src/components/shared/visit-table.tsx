@@ -1,3 +1,8 @@
+import { useState } from "react";
+
+import { PhotosDialog } from "@/components/shared/photos-dialog";
+import type { PhotoEntityType } from "@/lib/photos";
+
 import { StateVisit } from "@/types/states";
 import { CountryVisit } from "@/types/countries";
 import { ParkVisit } from "@/types/parks";
@@ -11,7 +16,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-import { Info, Plane } from "lucide-react";
+import { Info, Plane, Camera } from "lucide-react";
 
 type TravelTableBase = {
   user: string;
@@ -40,6 +45,12 @@ export function VisitTable({
   user,
   fetchVisits,
 }: TravelTableProps) {
+  const [selectedPhotoEntity, setSelectedPhotoEntity] = useState<{
+    id: string;
+    type: PhotoEntityType;
+    name: string;
+  } | null>(null);
+  
   async function updateVisitStatus({
     location,
     id,
@@ -119,7 +130,7 @@ export function VisitTable({
                   </TableCell>
 
                   {/* Airport Only */}
-                  <TableCell className="w-[25%]">
+                  <TableCell className="w-[20%]">
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
@@ -157,6 +168,37 @@ export function VisitTable({
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
+                  </TableCell>
+
+                  {/* Photo */}
+                  <TableCell className="w-[5%]">
+                    <button
+                      type="button"
+                      disabled={!country.visited}
+                      onClick={() => {
+                        if (!country.visited) return;
+
+                        setSelectedPhotoEntity({
+                          id: country.country_id,
+                          type: "country",
+                          name: country.country_name,
+                        });
+                      }}
+                      aria-label={`View photos of ${country.country_name}`}
+                      className={`transition ${
+                        country.visited
+                          ? "cursor-pointer"
+                          : "opacity-40 cursor-not-allowed"
+                      }`}
+                    >
+                      <Camera
+                        className={`h-5 w-5 ${
+                          country.visited
+                            ? "text-muted-foreground hover:text-primary"
+                            : "text-muted-foreground"
+                        }`}
+                      />
+                    </button>
                   </TableCell>
                 </TableRow>
               ))}
@@ -209,7 +251,7 @@ export function VisitTable({
                   </TableCell>
 
                   {/* Airport Only */}
-                  <TableCell className="w-[25%]">
+                  <TableCell className="w-[20%]">
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
@@ -248,6 +290,37 @@ export function VisitTable({
                       </Tooltip>
                     </TooltipProvider>
                   </TableCell>
+
+                  {/* Photo */}
+                  <TableCell className="w-[5%]">
+                    <button
+                      type="button"
+                      disabled={!state.visited}
+                      onClick={() => {
+                        if (!state.visited) return;
+
+                        setSelectedPhotoEntity({
+                          id: state.state_id,
+                          type: "state",
+                          name: state.state_name,
+                        });
+                      }}
+                      aria-label={`View photos of ${state.state_name}`}
+                      className={`transition ${
+                        state.visited
+                          ? "cursor-pointer"
+                          : "opacity-40 cursor-not-allowed"
+                      }`}
+                    >
+                      <Camera
+                        className={`h-5 w-5 ${
+                          state.visited
+                            ? "text-muted-foreground hover:text-primary"
+                            : "text-muted-foreground"
+                        }`}
+                      />
+                    </button>
+                  </TableCell>
                 </TableRow>
               ))}
             {location === "national_parks" &&
@@ -256,7 +329,7 @@ export function VisitTable({
                   <TableCell className="font-medium w-[75%]">
                     {(park as ParkVisit).park_name}
                   </TableCell>
-                  <TableCell className="w-[25%]">
+                  <TableCell className="w-[20%]">
                     <Checkbox
                       checked={(park as ParkVisit).visited}
                       onCheckedChange={async (checked) => {
@@ -269,10 +342,51 @@ export function VisitTable({
                       }}
                     />
                   </TableCell>
+                  <TableCell className="w-[5%]">
+                    <button
+                      type="button"
+                      disabled={!park.visited}
+                      onClick={() => {
+                        if (!park.visited) return;
+
+                        setSelectedPhotoEntity({
+                          id: park.park_id,
+                          type: "park",
+                          name: park.park_name,
+                        });
+                      }}
+                      aria-label={`View photos of ${park.park_name}`}
+                      className={`transition ${
+                        park.visited
+                          ? "cursor-pointer"
+                          : "opacity-40 cursor-not-allowed"
+                      }`}
+                    >
+                      <Camera
+                        className={`h-5 w-5 ${
+                          park.visited
+                            ? "text-muted-foreground hover:text-primary"
+                            : "text-muted-foreground"
+                        }`}
+                      />
+                    </button>
+                  </TableCell>
                 </TableRow>
               ))}
           </TableBody>
         </Table>
+
+        {selectedPhotoEntity && (
+          <PhotosDialog
+            user_id={user}
+            entity_type={selectedPhotoEntity.type}
+            entity_id={selectedPhotoEntity.id}
+            title={selectedPhotoEntity.name}
+            open={true}
+            onClose={() => setSelectedPhotoEntity(null)}
+            onPhotosUploaded={fetchVisits}
+          />
+        )}
       </div>
     </div>
   );
