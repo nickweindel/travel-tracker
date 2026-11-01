@@ -33,6 +33,17 @@ function isPhotoEntityType(value: string): value is PhotoEntityType {
   return value === "country" || value === "park" || value === "state";
 }
 
+function getEntityId(
+  row: Record<string, unknown>,
+  idColumn: (typeof PHOTO_TABLES)[PhotoEntityType]["idColumn"],
+): string {
+  const value = row[idColumn];
+  if (typeof value !== "string") {
+    throw new Error(`Missing ${idColumn} on photo row`);
+  }
+  return value;
+}
+
 export async function GET(req: NextRequest) {
   try {
     const supabase = await createClient();
@@ -100,7 +111,10 @@ export async function GET(req: NextRequest) {
             id: row.id,
             user_id: row.user_id,
             entity_type: type,
-            entity_id: row[config.idColumn],
+            entity_id: getEntityId(
+              row as Record<string, unknown>,
+              config.idColumn,
+            ),
             storage_path: row.storage_path,
             public_url: publicUrlData.publicUrl,
           } satisfies PhotoResponse;
